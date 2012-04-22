@@ -1,0 +1,169 @@
+<div class="wrap">
+    <div id="icon-options-general" class="icon32"><br /></div>
+    <h2><?php echo __('Settings › AutoSharePost', WP_AUTOSHAREPOST_DOMAIN) ?></h2>
+    
+    <?php if (isset($this->successMessage)): ?>
+        <?php echo $this->wasp->viewHelperMessage($this->successMessage, NULL, CheckdomainWordpressBase::MESSAGE_UPDATED); ?>
+    <?php endif; ?>
+    
+    <form method="post" target="_self" action="">
+    
+    
+        <h3><?php echo __('General Settings', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
+        
+        <table class="form-table">
+            <tbody>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for=""><?php echo __('Enable AutoSharePost', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input type="checkbox" value="1" name="autosharepost[enabled]"<?php echo ($this->autoEnabled == '1') ? ' checked="checked"' : '' ?> />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        
+        <h3><?php echo __('Facebook Settings', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
+        
+        <?php if (isset($this->facebookError)): ?>
+            <?php echo $this->wasp->viewHelperMessage($this->facebookError, __('Facebook Error', WP_AUTOSHAREPOST_DOMAIN)); ?>
+        <?php endif; ?>
+        
+        <table class="form-table">
+            <tbody>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-app-name"><?php echo __('App/Page Name', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-app-name" type="text" class="regular-text code" value="<?php echo $this->facebookAppName ?>" name="autosharepost[facebook][app_name]" readonly="readonly" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-app-id"><?php echo __('App ID', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-app-id" type="text" class="regular-text code" value="<?php echo $this->facebookAppId ?>" name="autosharepost[facebook][app_id]" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-app-secret"><?php echo __('App Secret', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-app-secret" type="text" class="regular-text code" value="<?php echo $this->facebookAppSecret ?>" name="autosharepost[facebook][app_secret]" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-page-id"><?php echo __('Page ID', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-page-id" type="text" class="regular-text code" value="<?php echo $this->facebookPageId ?>" name="autosharepost[facebook][page_id]" />
+                        <br />
+                        <?php echo __('<strong>Optional</strong> Only if you want to manage a page'); ?>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-token"><?php echo __('Token', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-token" type="text" class="large-text code" value="<?php echo $this->facebookAccessToken ?>" name="autosharepost[facebook][access_token]" readonly="readonly" />
+                        <br />
+                        <a href="<?php echo $this->facebookLogin; ?>"><?php echo __('Request token', WP_AUTOSHAREPOST_DOMAIN) ?></a>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-disable-bitly"><?php echo __('Disable Bit.ly URL Shortening', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-disable-bitly" type="checkbox" name="autosharepost[facebook][disable_bitly]" value="1" <?php echo ($this->facebookBitlyDisabled == '1') ? 'checked="checked"' : '' ?> />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        
+        <h3><?php echo __('Twitter Settings', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
+        
+        <table class="form-table">
+            <tbody>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-twitter-consumer-key"><?php echo __('Consumer Key', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-twitter-consumer-key" class="regular-text code" type="text" name="autosharepost[twitter][consumer_key]" value="<?php echo $this->twitterConsumerKey ?>" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-twitter-consumer-secret"><?php echo __('Consumer Secret', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-twitter-consumer-secret" class="regular-text code" type="text" name="autosharepost[twitter][consumer_secret]" value="<?php echo $this->twitterConsumerSecret ?>" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-twitter-oauth-token"><?php echo __('OAuth Token', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-twitter-oauth-token" class="regular-text code" type="text" name="autosharepost[twitter][oauth_token]" value="<?php echo $this->twitterOAuthToken ?>" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-twitter-oauth-secret"><?php echo __('OAuth Secret', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-twitter-oauth-secret" class="regular-text code" type="text" name="autosharepost[twitter][oauth_secret]" value="<?php echo $this->twitterOAuthSecret ?>" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-twitter-url-seperator"><?php echo __('OAuth Secret', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <select id="wasp-twitter-url-seperator" class="regular-text code" name="autosharepost[twitter][url_seperator]">
+                            <option value=" "<?php echo ($this->twitterUrlSeperator == ' ') ? ' selected="selected"' : '' ?>><?php echo __('Whitespace', WP_AUTOSHAREPOST_DOMAIN); ?></option>
+                            <option value="user-defined"<?php echo ($this->twitterUrlSeperator != ' ' && !empty($this->twitterUrlSeperator)) ? ' selected="selected"' : '' ?>><?php echo __('As defined:', WP_AUTOSHAREPOST_DOMAIN); ?></option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3><?php echo __('Bit.ly Url Shortening', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
+        
+        <table class="form-table">
+            <tbody>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-bitly-login"><?php echo __('Login', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-bitly-login" type="text" value="<?php echo $this->bitlyLogin ?>" class="regular-text code" name="autosharepost[bitly][login]" />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-bitly-api"><?php echo __('API Key', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-bitly-api"type="text" value="<?php echo $this->bitlyApiKey ?>" class="regular-text code" name="autosharepost[bitly][api_key]" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p class="submit">
+            <input type="submit" name="submit" id="submit" class="button-primary" value="<?php echo __('Save Changes') ?>" />
+        </p>
+    </form>
+</div>

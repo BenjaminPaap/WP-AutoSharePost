@@ -1,0 +1,51 @@
+<?php if ($time = strtotime($this->shared)): ?>
+    <h4><?php echo __('Post shared'); ?></h4>
+    <div>
+        <?php echo sprintf(__('Post was shared on %1$s'), date(get_option('date_format') . ' ' . get_option('time_format'), $time)); ?>
+    </div>
+    <table>
+        <tbody>
+            <tr>
+                <th>
+                    <label><?php echo __('Re-Share this Post', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                </th>
+                <td>
+                    <input type="checkbox" value="1" name="autosharepost[re-share]" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <br />
+<?php endif; ?>
+
+<h4><?php echo __('Social Network Post Messages'); ?></h4>
+<table>
+    <tbody>
+        <tr>
+            <th>
+                <label for="wasp-enabled"><?php echo __('Enable AutoSharePost', WP_AUTOSHAREPOST_DOMAIN); ?></label>
+            </th>
+            <td>
+                <input id="wasp-enabled" type="checkbox" value="1" name="autosharepost[enabled]"<?php echo ($this->enabled == '1') ? ' checked="checked"' : '' ?> />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="wasp-facebook-text"><?php echo __('Facebook Message', WP_AUTOSHAREPOST_DOMAIN); ?></label>
+            </th>
+            <td>
+                <textarea class="regular-text code" id="wasp-facebook-text" name="autosharepost[facebook][text]" cols="80" rows="4"><?php echo $this->facebookText ?></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label for="wasp-twitter-text"><?php echo __('Twitter Message', WP_AUTOSHAREPOST_DOMAIN); ?></label>
+            </th>
+            <td>
+                <textarea class="regular-text code" id="wasp-twitter-text" name="autosharepost[twitter][text]" cols="80" rows="4"><?php echo $this->twitterText ?></textarea>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<?php echo $this->nonceField; ?>
