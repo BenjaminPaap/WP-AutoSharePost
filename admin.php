@@ -3,6 +3,13 @@
 require_once(WP_AUTOSHAREPOST_DIR . '/lib/template.class.php');
 require_once(WP_AUTOSHAREPOST_DIR . '/lib/cd-wordpress-base.php');
 
+/**
+ * WordpressAutoSharePostAdmin Class
+ *
+ * This class handles all admin stuff for the AutoSharePost plugin
+ *
+ * @author Benjamin
+ */
 class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 {
 
@@ -30,12 +37,34 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const META_SHARED                    = 'wp-autosharepost-shared';
     const META_BITLY_URL                 = 'wp-autosharepost-bitly-url';
     
+    /**
+     * Holds the template class
+     * @var Template
+     */
     private $_tpl        = NULL;
 
+    /**
+     * Holds the facebook instance
+     * @var Facebook
+     */
     private $_facebook   = NULL;
+    
+    /**
+     * Holds the twitter instance
+     * @var TwitterOAuth
+     */
     private $_twitter    = NULL;
+    
+    /**
+     * Holds the Bit.ly instance
+     * @var Bitly
+     */
     private $_bitly      = NULL;
     
+    /**
+     * Holds the slug for this plugin
+     * @var string
+     */
     private $_slug       = 'wp-autosharepost';
     
     /**
@@ -56,8 +85,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         $this->_getFacebookInstance();
 
-        register_activation_hook(__FILE__, array(&$this, 'hookInstall'));
-
         add_action('admin_menu',          array(&$this, 'hookAdminMenu'));
         add_action('add_meta_boxes',      array(&$this, 'hookAddMetaBoxes'));
         add_action('save_post',           array(&$this, 'hookSavePost'));
@@ -65,12 +92,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         add_action('publish_post',        array(&$this, 'hookPublishPost'));
         add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
     }
-    
-    public function hookInstall()
-    {
 
-    }
-
+    /**
+     * Gets a Facebook instance
+     *
+     * This method creates a Facebook instance if none exists or returns an
+     * existing one
+     *
+     * @return Facebook
+     */
     protected function _getFacebookInstance()
     {
         if (!class_exists('Facebook')) {
@@ -91,6 +121,14 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         return $this->_facebook;
     }
     
+    /**
+     * Gets a TwitterOAuth instance
+     *
+     * This method creates a TwitterOAuth instance if none exists or returns an
+     * existing one
+     *
+     * @return TwitterOAuth
+     */
     protected function _getTwitterInstance()
     {
         if (!class_exists('TwitterOAuth')) {
@@ -109,6 +147,14 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         return $this->_twitter;
     }
 
+    /**
+     * Gets a Bitly instance
+     *
+     * This method creates a Bitly instance if none exists or returns an
+     * existing one
+     *
+     * @return Bitly
+     */
     protected function _getBitlyInstance()
     {
         if (!class_exists('Bitly')) {
@@ -124,6 +170,12 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         return $this->_bitly;
     }
     
+    /**
+     * Hook to add a meta box
+     *
+     * This hook adds a meta box to the "Edit Post" page to define the various
+     * text messages for all configured social networks
+     */
     public function hookAddMetaBoxes()
     {
         add_meta_box('wp-autosharepost-text',
@@ -185,32 +237,55 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
     }
     
+    /**
+     * Hook to publish a post
+     *
+     * This hook will be called when a post gets published. It shares the
+     * specified text messages for all configured social networks.
+     *
+     * @param int $post_id
+     */
     public function hookPublishPost($post_id)
     {
         if (wp_is_post_revision($post_id)) {
             return;
         }
         
-        $shared = get_post_meta($post_id, self::META_SHARED, TRUE);
+        $enabled = get_post_meta($post_id, self::META_ENABLED, TRUE);
+        $shared  = get_post_meta($post_id, self::META_SHARED, TRUE);
         
-        if (strtotime($shared) === FALSE || $_POST['autosharepost']['re-share'] == '1') {
+        if ($enabled == '1' && strtotime($shared) === FALSE || $_POST['autosharepost']['re-share'] == '1') {
             $this->_share($post_id);
         }
     }
     
+    /**
+     * Hook to publish a future post
+     *
+     * This hook will be called when a future post gets published. It shares the
+     * specified text messages for all configured social networks.
+     *
+     * @param int $post_id
+     */
     public function hookPublishFuturePost($post_id)
     {
         if (wp_is_post_revision($post_id)) {
             return;
         }
-                
+        
+        $enabled = get_post_meta($post_id, self::META_ENABLED, TRUE);
         $shared = get_post_meta($post_id, self::META_SHARED, TRUE);
         
-        if (strtotime($shared) === FALSE) {
+        if ($enabled == '1' && strtotime($shared) === FALSE) {
             $this->_share($post_id);
         }
     }
 
+    /**
+     * Hook to add an admin menu
+     *
+     * This hook adds all needed menu entries to the admin menu
+     */
     public function hookAdminMenu()
     {
         /*
@@ -229,6 +304,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         */
     }
 
+    /**
+     * Action to handle settings
+     *
+     * This action handles the settings page.
+     */
     public function actionSettings()
     {
         if (isset($_POST['submit'])) {
@@ -340,13 +420,23 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 
     }
     
+    /**
+     * Shares a post to social networks
+     *
+     * This method shares the specified text messages for a post to all
+     * configured social networks
+     *
+     * @param int $post_id
+     */
     protected function _share($post_id)
     {
+        // Try to get the post
         $post = get_post($post_id);
         $error = '';
         
         // Share this now on all platforms
         if ($post->post_status == 'publish' && $post->post_type == 'post') {
+            // Check if this post already has a shortened bitly url
             $bitlyUrl = get_post_meta($post_id, self::META_BITLY_URL, TRUE);
             $permalink = get_permalink($post_id);
             
@@ -364,23 +454,19 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             $picture = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'large');
             
             // Post on facebook.com
-            $facebook = array();
-            $facebook['message'] = get_post_meta($post_id, self::META_FACEBOOK_TEXT, TRUE);
-            $facebook['picture'] = $picture[0];
-            $facebook['AccessToken'] = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
-            
             $disableBitly = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
             
             $params = array(
-                'message'  => $facebook['message'],
+                'message'  => get_post_meta($post_id, self::META_FACEBOOK_TEXT, TRUE),
                 'link'     => ($disableBitly == '1') ? $permalink : $bitlyUrl,
                 'caption'  => $post->post_title,
+                'picture'  => $picture[0]
             );
             
             if (empty($error)) {
                 if (!empty($facebook['AccessToken'])) {
                     $fb = $this->_getFacebookInstance();
-                    $fb->setAccessToken($facebook['AccessToken']);
+                    $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, NULL));
                     
                     try {
                         $fb->api('/' . $appId . '/feed', 'POST', $params);
@@ -395,13 +481,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             // Post on twitter.com
             if (empty($error)) {
                 $seperator = get_option(self::OPTION_TWITTER_URL_SEPERATOR, NULL);
-                
-                $twitter = array();
-                $twitter['message'] = get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE) . $seperator . $bitlyUrl;
+                if (empty($seperator)) $seperator = ' ';
                 
                 $tw = $this->_getTwitterInstance();
                 $tw->post('statuses/update', array(
-                    'status' => $twitter['message']
+                    'status' => get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE) . $seperator . $bitlyUrl
                 ));
             }
             
@@ -413,4 +497,5 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 
 }
 
+// Instantiate the admin class
 $wasp_admin = new WordpressAutoSharePostAdmin();
