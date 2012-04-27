@@ -1,10 +1,32 @@
 <?php if ($time = strtotime($this->shared)): ?>
     <h4><?php echo __('Post shared'); ?></h4>
-    <div>
-        <?php echo sprintf(__('Post was shared on %1$s'), date(get_option('date_format') . ' ' . get_option('time_format'), $time)); ?>
-    </div>
-    <table>
+    <table class="form-table">
         <tbody>
+            <tr>
+                <th>
+                    <label><?php echo __('Post was shared on') ?></label>
+                </th>
+                <td>
+                   	<?php echo date(get_option('date_format') . ' ' . get_option('time_format'), $time) ?>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label><?php echo __('Posting Links', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                </th>
+                <td>
+                    <a href="<?php echo sprintf(
+						'http://www.facebook.com/%1$s/posts/%2$s',
+                		(!empty($this->facebookPage)) ? $this->facebookPage : $this->facebookApp,
+                		$this->facebookPostId
+                	); ?>" target="_blank" title="<?php echo __('View Post on Facebook', WP_AUTOSHAREPOST_DOMAIN); ?>"><i class="icon-facebook"></i></a>
+                    <a href="<?php echo sprintf(
+						'http://www.twitter.com/%1$s/status/%2$s',
+                		$this->twitterUser,
+                		$this->twitterTweetId
+                	); ?>" target="_blank" title="<?php echo __('View Post on Twitter', WP_AUTOSHAREPOST_DOMAIN); ?>"><i class="icon-twitter"></i></a>
+                </td>
+            </tr>
             <tr>
                 <th>
                     <label><?php echo __('Re-Share this Post', WP_AUTOSHAREPOST_DOMAIN) ?></label>
@@ -44,6 +66,7 @@
             </th>
             <td>
                 <textarea class="regular-text code" id="wasp-twitter-text" name="autosharepost[twitter][text]" cols="80" rows="4"><?php echo $this->twitterText ?></textarea>
+                <span><span id="wasp-twitter-characters-left"></span> <?php echo __('Characters left') ?></span>
             </td>
         </tr>
     </tbody>

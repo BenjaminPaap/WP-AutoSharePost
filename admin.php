@@ -13,6 +13,8 @@ require_once(WP_AUTOSHAREPOST_DIR . '/lib/cd-wordpress-base.php');
 class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 {
 
+	const PLUGIN_STYLE_NAME_MAIN		 = 'wp-autosharepost-style-main';
+	
     const OPTION_AUTOENABLED             = 'wp-autosharepost-autoenabled';
     
     const OPTION_FACEBOOK_APPID          = 'wp-autosharepost-fb-appid';
@@ -20,6 +22,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const OPTION_FACEBOOK_PAGEID         = 'wp-autosharepost-fb-pageid';
     const OPTION_FACEBOOK_APPNAME        = 'wp-autosharepost-fb-appname';
     const OPTION_FACEBOOK_TOKEN          = 'wp-autosharepost-fb-token';
+    const OPTION_FACEBOOK_DESCRIPTION	 = 'wp-autosharepost-fb-description';
     const OPTION_FACEBOOK_DISABLE_BITLY  = 'wp-autosharepost-fb-disablebitly';
     
     const OPTION_TWITTER_CONSUMER_KEY    = 'wp-autosharepost-twitter-consumer-key';
@@ -33,7 +36,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     
     const META_ENABLED                   = 'wp-autosharepost-enabled';
     const META_FACEBOOK_TEXT             = 'wp-autosharepost-fb-text';
+    const META_FACEBOOK_POST			 = 'wp-autosharepost-fb-post-id';
+    const META_COMMENT_FACEBOOK_ID		 = 'wp-autosharepost-fb-comment-id';
     const META_TWITTER_TEXT              = 'wp-autosharepost-twitter-text';
+    const META_TWITTER_POST				 = 'wp-autosharepost-twitter-post-id';
+    const META_TWITTER_POST_USER		 = 'wp-autosharepost-twitter-post-user';
     const META_SHARED                    = 'wp-autosharepost-shared';
     const META_BITLY_URL                 = 'wp-autosharepost-bitly-url';
     
@@ -72,25 +79,38 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     public function __construct()
     {
-        add_action('init', array(&$this, 'init'));
+        add_action('admin_init', array(&$this, 'actionAdminInit'));
+        add_action('init', array(&$this, 'actionInit'));
     }
 
     /**
-     * Initialization
+     * General Initialization
      */
-    public function init()
+    public function actionInit()
+    {
+        add_action('publish_post',        array(&$this, 'hookPublishPost'));
+        add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
+    }
+    
+    /**
+     * Admin Initialization
+     */
+    public function actionAdminInit()
     {
         $this->_tpl = new Template();
         $this->_tpl->wasp = $this;
         
         $this->_getFacebookInstance();
-
+        
+        wp_register_style(self::PLUGIN_STYLE_NAME_MAIN,
+        				  plugins_url('/css/wp-autoshareposts.css', __FILE__));
+        wp_enqueue_style(self::PLUGIN_STYLE_NAME_MAIN);
+        
         add_action('admin_menu',          array(&$this, 'hookAdminMenu'));
         add_action('add_meta_boxes',      array(&$this, 'hookAddMetaBoxes'));
         add_action('save_post',           array(&$this, 'hookSavePost'));
         
-        add_action('publish_post',        array(&$this, 'hookPublishPost'));
-        add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
+        wp_enqueue_script($this->_slug, plugin_dir_url(__FILE__) . 'js/autosharepost.js');
     }
 
     /**
@@ -198,8 +218,16 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         $this->_tpl->enabled      = get_post_meta($post->ID, self::META_ENABLED, TRUE);
         $this->_tpl->facebookText = get_post_meta($post->ID, self::META_FACEBOOK_TEXT, TRUE);
+        $this->_tpl->facebookApp  = get_option(self::OPTION_FACEBOOK_APPID, NULL);
+        $this->_tpl->facebookPage = get_option(self::OPTION_FACEBOOK_PAGEID, NULL);
         $this->_tpl->twitterText  = get_post_meta($post->ID, self::META_TWITTER_TEXT, TRUE);
         $this->_tpl->shared       = get_post_meta($post->ID, self::META_SHARED, TRUE);
+        
+        if (strtotime($this->_tpl->shared) !== FALSE) {
+        	$this->_tpl->facebookPostId = get_post_meta($post->ID, self::META_FACEBOOK_POST, TRUE);
+        	$this->_tpl->twitterTweetId = get_post_meta($post->ID, self::META_TWITTER_POST, TRUE);
+        	$this->_tpl->twitterUser    = get_post_meta($post->ID, self::META_TWITTER_POST_USER, TRUE);
+        }
         
         $this->_tpl->render('metabox/text');
     }
@@ -251,6 +279,10 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             return;
         }
         
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        	return;
+        }
+        
         $enabled = get_post_meta($post_id, self::META_ENABLED, TRUE);
         $shared  = get_post_meta($post_id, self::META_SHARED, TRUE);
         
@@ -271,6 +303,10 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     {
         if (wp_is_post_revision($post_id)) {
             return;
+        }
+        
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        	return;
         }
         
         $enabled = get_post_meta($post_id, self::META_ENABLED, TRUE);
@@ -294,7 +330,19 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         add_submenu_page('wp-autosharepost', 'Twitter Posts', 'Twitter Posts', TRUE, 'wp-autosharepost-facebook', array(&$this, 'actionTwitterPosts'));
         */
         
-        add_options_page('AutoSharePost Settings', 'AutoSharePosts', TRUE, 'wp-autosharepost-settings', array(&$this, 'actionSettings'));
+    	// Add the settings page
+        $pageSettings 		= add_options_page('AutoSharePost Settings',
+        									   'AutoSharePosts',
+        									   TRUE,
+        									   'wp-autosharepost-settings',
+        									   array(&$this, 'actionSettings'));
+        
+        // Add a configuration page for the comment grabber
+        $pageCommentGrabber = add_options_page('AutoSharePost CommentGrabber',
+        									   'CommentGrabber',
+        									   TRUE,
+        									   'wp-autosharepost-comments',
+        									   array(&$this, 'actionCommentGrabber'));
 
         /*
         global $menu;
@@ -319,6 +367,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             update_option(self::OPTION_FACEBOOK_APPID,         $_POST['autosharepost']['facebook']['app_id']);
             update_option(self::OPTION_FACEBOOK_APPSECRET,     $_POST['autosharepost']['facebook']['app_secret']);
             update_option(self::OPTION_FACEBOOK_PAGEID,        $_POST['autosharepost']['facebook']['page_id']);
+            update_option(self::OPTION_FACEBOOK_DESCRIPTION,   intval($_POST['autosharepost']['facebook']['description']));
             update_option(self::OPTION_FACEBOOK_DISABLE_BITLY, $_POST['autosharepost']['facebook']['disable_bitly']);
             
             // Twitter options
@@ -346,7 +395,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             try {
                 // Ask facebook for all apps and pages this user manages
                 $result = $this->_facebook->api('/me/accounts');
-
                 if (is_array($result['data'])) {
                     $found = FALSE;
 
@@ -389,7 +437,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             'scope' => 'manage_pages',
             'display' => 'page'
         ));
-        $this->_tpl->facebookBitlyDisabled = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
+        $this->_tpl->facebookDescriptionWords = get_option(self::OPTION_FACEBOOK_DESCRIPTION, 20);
+        $this->_tpl->facebookBitlyDisabled    = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
         
         // Twitter options
         $this->_tpl->twitterConsumerKey     = get_option(self::OPTION_TWITTER_CONSUMER_KEY, '');
@@ -403,6 +452,64 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->bitlyLogin          = get_option(self::OPTION_BITLY_LOGIN, '');
 
         $this->_tpl->render('settings/index');
+    }
+    
+    public function actionCommentGrabber()
+    {
+    	global $wpdb;
+    	
+        $appId          = get_option(self::OPTION_FACEBOOK_APPID, '');
+        $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID, '');
+        
+        $fb = $this->_getFacebookInstance();
+        $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, ''));
+        
+        $fb_result = $fb->api('/' . $pageId . '/feed');
+        
+        if (is_array($fb_result['data'])) {
+	        foreach ($fb_result['data'] as $post) {
+	        	if (!isset($post['comments']['count'])) continue;
+	        	if ($post['comments']['count'] == 0) continue;
+	        	
+			    $row = $wpdb->get_row("SELECT * "
+			        				 ."FROM $wpdb->post_meta "
+			        			 	 ."WHERE meta_key = '" . self::META_FACEBOOK_POST . "' "
+			        				 ."AND   meta_value = '" . $post['id'] . "'");
+			    
+			    if ($row->post_id > 0) {
+			    	$comment_post = get_post($row->post_id);
+			    	
+			    	foreach ($post['comments']['data'] as $comment) {
+			    		$row = $wpdb->get_row("SELECT * "
+				    						 ."FROM $wpdb->commentmeta "
+				    						 ."WHERE meta_key = '" . self::META_COMMENT_FACEBOOK_ID . "' "
+				    						 ."AND   meta_value = '" . $comment['id'] . "'");
+			    		
+			    		$new_comment = array(
+				    		'comment_post_ID' => $row->post_id,
+				    		'comment_author' => $comment['from']['name'],
+				    		'comment_author_email' => '',
+				    		'comment_author_url' => '',
+				    		'comment_content' => $comment['message'],
+				    		'comment_type' => '',
+				    		'comment_parent' => 0,
+				    		'user_id' => 0,
+				    		'comment_author_IP' => '127.0.0.1',
+				    		'comment_agent' => 'FacebookCommentGrabber|' . $comment['id'],
+				    		'comment_date' => $comment['time'],
+				    		'comment_approved' => 0,
+			    		);
+			    		
+			    		$comment_id = wp_new_comment($new_comment);
+			    		add_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_ID, $comment['id'], TRUE);
+			    		
+			    		wp_update_comment_count($comment_id);
+			    	}
+			    }
+	        }
+        } else {
+        	throw new Exception(__('Could not load data from facebook.'));
+        }
     }
 
     public function actionOverview()
@@ -456,20 +563,35 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             // Post on facebook.com
             $disableBitly = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
             
+            $words = preg_split('/[\s]+/', $post->post_content, NULL, PREG_SPLIT_DELIM_CAPTURE);
+            $text = strip_tags(implode(' ', array_slice($words, 0, get_option(self::OPTION_FACEBOOK_DESCRIPTION, 20))));
+            
             $params = array(
-                'message'  => get_post_meta($post_id, self::META_FACEBOOK_TEXT, TRUE),
-                'link'     => ($disableBitly == '1') ? $permalink : $bitlyUrl,
-                'caption'  => $post->post_title,
-                'picture'  => $picture[0]
+                'message'     => get_post_meta($post_id, self::META_FACEBOOK_TEXT, TRUE),
+                'link'        => ($disableBitly == '1') ? $permalink : $bitlyUrl,
+            	'name'	 	  => $post->post_title,
+                'description' => rtrim($text, '.') . '...',
+                'picture'     => $picture[0]
             );
             
+            $accessToken = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
+            
             if (empty($error)) {
-                if (!empty($facebook['AccessToken'])) {
+                if (!empty($accessToken)) {
+                	// Get an instance and set the corresponding access token
                     $fb = $this->_getFacebookInstance();
-                    $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, NULL));
+                    $fb->setAccessToken($accessToken);
+                    
+                    $appId          = get_option(self::OPTION_FACEBOOK_APPID, '');
+                    $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID, '');
+                    
+                    $profileId = $appId;
+                    if (!empty($pageId)) $profileId = $pageId;
                     
                     try {
-                        $fb->api('/' . $appId . '/feed', 'POST', $params);
+                    	// Share this post and save the post id in a meta field
+                        $fb_result = $fb->api('/' . $profileId . '/links', 'POST', $params);
+                        update_post_meta($post_id, self::META_FACEBOOK_POST, $fb_result['id']);
                     } catch(Exception $e) {
                         $error = sprintf(__('Could not post on facebook.com. Reason: %1$s'), $e->getMessage());
                     }
@@ -478,19 +600,32 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 }
             }
             
-            // Post on twitter.com
+            // Tweet on twitter.com
             if (empty($error)) {
                 $seperator = get_option(self::OPTION_TWITTER_URL_SEPERATOR, NULL);
                 if (empty($seperator)) $seperator = ' ';
                 
+                // Tweet this on twitter
                 $tw = $this->_getTwitterInstance();
-                $tw->post('statuses/update', array(
+                $tw_result = $tw->post('statuses/update', array(
                     'status' => get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE) . $seperator . $bitlyUrl
                 ));
+                
+                // Check for any errors
+                if (isset($tw_result->error)) {
+                	$error = $tw_result->error;
+                } else {
+                	// Save TweetID and user
+                	update_post_meta($post_id, self::META_TWITTER_POST, $tw_result->id_str);
+                	update_post_meta($post_id, self::META_TWITTER_POST_USER, (!empty($tw_result->user->screen_name) ? $tw_result->user->screen_name : $tw_result->user->id));
+                }
             }
             
+            // Update the shared time
             if (empty($error)) {
                 update_post_meta($post_id, self::META_SHARED, date('Y-m-d H:i:s'));
+            } else {
+            	echo '<div class="error">' . $error . '</div>';
             }
         }
     }

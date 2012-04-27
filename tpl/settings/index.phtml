@@ -8,7 +8,6 @@
     
     <form method="post" target="_self" action="">
     
-    
         <h3><?php echo __('General Settings', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
         
         <table class="form-table">
@@ -23,7 +22,6 @@
                 </tr>
             </tbody>
         </table>
-        
         
         <h3><?php echo __('Facebook Settings', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
         
@@ -75,6 +73,14 @@
                         <input id="wasp-fb-token" type="text" class="large-text code" value="<?php echo $this->facebookAccessToken ?>" name="autosharepost[facebook][access_token]" readonly="readonly" />
                         <br />
                         <a href="<?php echo $this->facebookLogin; ?>"><?php echo __('Request token', WP_AUTOSHAREPOST_DOMAIN) ?></a>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-fb-description-words"><?php echo __('Wordcount for description', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="wasp-fb-description-words" type="text" name="autosharepost[facebook][description]" value="<?php echo $this->facebookDescriptionWords ?>" />
                     </td>
                 </tr>
                 <tr valign="top">
