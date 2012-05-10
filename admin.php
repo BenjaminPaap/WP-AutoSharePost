@@ -79,8 +79,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     public function __construct()
     {
-        add_action('admin_init', array(&$this, 'actionAdminInit'));
         add_action('init', array(&$this, 'actionInit'));
+        add_action('admin_init', array(&$this, 'actionAdminInit'));
     }
 
     /**
@@ -88,6 +88,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     public function actionInit()
     {
+        add_action('admin_menu',          array(&$this, 'hookAdminMenu'));
         add_action('publish_post',        array(&$this, 'hookPublishPost'));
         add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
     }
@@ -106,7 +107,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         				  plugins_url('/css/wp-autoshareposts.css', __FILE__));
         wp_enqueue_style(self::PLUGIN_STYLE_NAME_MAIN);
         
-        add_action('admin_menu',          array(&$this, 'hookAdminMenu'));
         add_action('add_meta_boxes',      array(&$this, 'hookAddMetaBoxes'));
         add_action('save_post',           array(&$this, 'hookSavePost'));
         
@@ -343,7 +343,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         									   TRUE,
         									   'wp-autosharepost-comments',
         									   array(&$this, 'actionCommentGrabber'));
-
         /*
         global $menu;
         global $submenu;
@@ -465,25 +464,31 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, ''));
         
         $fb_result = $fb->api('/' . $pageId . '/feed');
+        var_dump($fb_result);
         
         if (is_array($fb_result['data'])) {
 	        foreach ($fb_result['data'] as $post) {
 	        	if (!isset($post['comments']['count'])) continue;
 	        	if ($post['comments']['count'] == 0) continue;
 	        	
+	        	var_dump($post);
+	        	$post_id = explode('_', $post['id']);
+	        	
 			    $row = $wpdb->get_row("SELECT * "
 			        				 ."FROM $wpdb->post_meta "
 			        			 	 ."WHERE meta_key = '" . self::META_FACEBOOK_POST . "' "
-			        				 ."AND   meta_value = '" . $post['id'] . "'");
+			        				 ."AND   meta_value = '" . $post_id[1] . "'");
 			    
 			    if ($row->post_id > 0) {
 			    	$comment_post = get_post($row->post_id);
 			    	
 			    	foreach ($post['comments']['data'] as $comment) {
-			    		$row = $wpdb->get_row("SELECT * "
-				    						 ."FROM $wpdb->commentmeta "
-				    						 ."WHERE meta_key = '" . self::META_COMMENT_FACEBOOK_ID . "' "
-				    						 ."AND   meta_value = '" . $comment['id'] . "'");
+			    		$comment_row = $wpdb->get_row("SELECT * "
+				    						 		 ."FROM $wpdb->commentmeta "
+				    						 		 ."WHERE meta_key = '" . self::META_COMMENT_FACEBOOK_ID . "' "
+				    						 		 ."AND   meta_value = '" . $comment['id'] . "'");
+			    		var_dump('COMMENT ' . $comment['id']);
+			    		if ($comment_row->comment_ID > 0) continue;
 			    		
 			    		$new_comment = array(
 				    		'comment_post_ID' => $row->post_id,
@@ -499,6 +504,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 				    		'comment_date' => $comment['time'],
 				    		'comment_approved' => 0,
 			    		);
+			    		
+			    		var_dump('NEW COMMENT FOUND');
 			    		
 			    		$comment_id = wp_new_comment($new_comment);
 			    		add_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_ID, $comment['id'], TRUE);
@@ -571,7 +578,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 'link'        => ($disableBitly == '1') ? $permalink : $bitlyUrl,
             	'name'	 	  => $post->post_title,
                 'description' => rtrim($text, '.') . '...',
-                'picture'     => $picture[0]
+                'picture'     => $picture[0],
             );
             
             $accessToken = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
