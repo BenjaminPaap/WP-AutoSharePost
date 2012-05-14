@@ -110,7 +110,7 @@ class WordpressAutoSharePost
 	public function filterSchedulePluginInterval($schedules)
 	{
 		$schedules['wp-autosharepost-interval'] = array(
-    		'interval' => intval(get_option(WordpressAutoSharePostAdmin::OPTION_COMMENT_GRAB_INTERVAL, 10)) * 60,
+    		'interval' => intval(get_option(WordpressAutoSharePostAdmin::OPTION_COMMENTGRABBER_INTERVAL, WordpressAutoSharePostAdmin::DEFAULT_COMMENTGRABBER_INTERVAL)) * 60,
     		'display' => __('WP-AutoSharePost Interval')
     	);
 		

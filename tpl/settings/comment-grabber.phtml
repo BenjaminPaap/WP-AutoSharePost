@@ -1,0 +1,46 @@
+<div class="wrap">
+    <div id="icon-options-general" class="icon32"><br /></div>
+    <h2><?php echo __('Settings › AutoSharePost', WP_AUTOSHAREPOST_DOMAIN) ?></h2>
+    
+    <?php if (isset($this->successMessage)): ?>
+        <?php echo $this->wasp->viewHelperMessage($this->successMessage, NULL, CheckdomainWordpressBase::MESSAGE_UPDATED); ?>
+    <?php endif; ?>
+    
+    <form method="post" target="_self" action="">
+    
+        <h3><?php echo __('General Settings', WP_AUTOSHAREPOST_DOMAIN) ?></h3>
+        
+        <table class="form-table">
+            <tbody>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="commentgrabber-enabled"><?php echo __('Enable CommentGrabber', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="commentgrabber-enabled" type="checkbox" value="1" name="commentgrabber[enabled]"<?php echo ($this->grabberEnabled == '1') ? ' checked="checked"' : '' ?> />
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="commentgrabber-interval"><?php echo __('Interval', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="commentgrabber-interval" type="text" value="<?php echo $this->grabberInterval ?>" name="commentgrabber[interval]" />
+                        <?php echo __('Minutes', WP_AUTOSHAREPOST_DOMAIN); ?>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="commentgrabber-auto-approve"><?php echo __('Auto-Approve new Comments', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="commentgrabber-auto-approve" type="checkbox" value="1" name="commentgrabber[approve]"<?php echo ($this->grabberApprove == '1') ? ' checked="checked"' : '' ?> />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="submit">
+            <input type="submit" name="submit" id="submit" class="button-primary" value="<?php echo __('Save Changes') ?>" />
+        </p>
+	</form>
+</div>

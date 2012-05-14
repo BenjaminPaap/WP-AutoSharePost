@@ -34,8 +34,12 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const OPTION_BITLY_APIKEY            = 'wp-autosharepost-bitly-apikey';
     const OPTION_BITLY_LOGIN             = 'wp-autosharepost-bitly-login';
     
-	const OPTION_COMMENT_GRAB_INTERVAL 	 = 'wp-autosharepost-commentgrabber-interval';
-    
+	const OPTION_COMMENTGRABBER_ENABLED  = 'wp-autosharepost-commentgrabber-enabled';
+	const OPTION_COMMENTGRABBER_INTERVAL = 'wp-autosharepost-commentgrabber-interval';
+	const OPTION_COMMENTGRABBER_APPROVE	 = 'wp-autosharepost-commentgrabber-approve';
+	
+	const DEFAULT_COMMENTGRABBER_INTERVAL = 10;
+	 
     const META_ENABLED                   = 'wp-autosharepost-enabled';
     const META_FACEBOOK_TEXT             = 'wp-autosharepost-fb-text';
     const META_FACEBOOK_POST			 = 'wp-autosharepost-fb-post-id';
@@ -337,12 +341,19 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         add_submenu_page('wp-autosharepost', 'Twitter Posts', 'Twitter Posts', TRUE, 'wp-autosharepost-facebook', array(&$this, 'actionTwitterPosts'));
         */
         
-    	// Add the settings page
+    	// Add the main settings page
         $pageSettings 		= add_options_page('AutoSharePost Settings',
         									   'AutoSharePosts',
         									   TRUE,
         									   'wp-autosharepost-settings',
-        									   array(&$this, 'actionSettings'));
+        									   array(&$this, 'actionAutoSharePostSettings'));
+        
+    	// Add the CommentGrabber settings page
+        $pageSettings 		= add_options_page('CommentGrabber Settings',
+        									   'CommentGrabber',
+        									   TRUE,
+        									   'wp-autosharepost-commentgrabber',
+        									   array(&$this, 'actionCommentGrabberSettings'));
     }
 
     /**
@@ -350,7 +361,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      *
      * This action handles the settings page.
      */
-    public function actionSettings()
+    public function actionAutoSharePostSettings()
     {
         if (isset($_POST['submit'])) {
             // General options
@@ -447,6 +458,40 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     }
     
     /**
+     * Action to handle CommentGrabber settings
+     *
+     * This methods handles the settings page for the Facebook.com CommentGrabber
+     */
+    public function actionCommentGrabberSettings()
+    {
+        if (isset($_POST['submit'])) {
+            // CommentGrabber options
+            update_option(self::OPTION_COMMENTGRABBER_ENABLED,      $_POST['commentgrabber']['enabled']);
+            update_option(self::OPTION_COMMENTGRABBER_INTERVAL,		$_POST['commentgrabber']['interval']);
+            update_option(self::OPTION_COMMENTGRABBER_APPROVE,      $_POST['commentgrabber']['approve']);
+            
+            if (intval($_POST['commentgrabber']['enabled']) == 0) {
+	            if (wp_next_scheduled('wp_autosharepost_comment_grabber')) {
+	            	wp_clear_scheduled_hook('wp_autosharepost_comment_grabber');
+	            }
+            }
+            
+            if (intval($_POST['commentgrabber']['enabled']) == 1) {
+	            if (!wp_next_scheduled('wp_autosharepost_comment_grabber')) {
+	            	wp_schedule_event(time(), 'wp-autosharepost-interval', 'wp_autosharepost_comment_grabber');
+	            }
+            }
+        }
+        
+        // CommentGrabber options
+        $this->_tpl->grabberEnabled		= get_option(self::OPTION_COMMENTGRABBER_ENABLED, 0);
+        $this->_tpl->grabberInterval    = get_option(self::OPTION_COMMENTGRABBER_INTERVAL, self::DEFAULT_COMMENTGRABBER_INTERVAL);
+        $this->_tpl->grabberApprove     = get_option(self::OPTION_COMMENTGRABBER_APPROVE, 0);
+
+        $this->_tpl->render('settings/comment-grabber');
+    }
+    
+    /**
      * Grabs all comments from Facebook
      *
      * This method reads the feed of a page and grabs all the comments written by
@@ -458,8 +503,12 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     {
     	global $wpdb;
     	
+    	$enabled 		= intval(get_option(self::OPTION_COMMENTGRABBER_ENABLED, 0));
+    	$approve 		= intval(get_option(self::OPTION_COMMENTGRABBER_APPROVE, 0));
         $appId          = get_option(self::OPTION_FACEBOOK_APPID, '');
         $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID, '');
+        
+        if ($enabled == 0) return;
         
         $fb = $this->_getFacebookInstance();
         $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, ''));
@@ -507,16 +556,18 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 				    		'comment_author_IP' 	=> '127.0.0.1',
 				    		'comment_agent' 		=> 'FacebookCommentGrabber|' . $comment['id'],
 				    		'comment_date' 			=> date('Y-m-d H:i:s', strtotime($comment['created_time'])),
-				    		'comment_approved' 		=> 0,
+				    		'comment_approved' 		=> $approve,
 			    		);
 			    		
 			    		// Save the comment and the facebook comment id for reference
-			    		$comment_id = wp_new_comment($new_comment);
+			    		
+			    		$comment_id = wp_insert_comment($new_comment);
+			    		
 			    		update_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_ID, 	$comment['id'], TRUE);
 			    		update_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_USER, 	$comment['from']['id'], TRUE);
 			    		
 			    		// Update the comment count for this post
-			    		wp_update_comment_count($comment_id);
+			    		wp_update_comment_count($row->post_id);
 			    	}
 			    }
 	        }
