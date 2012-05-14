@@ -34,10 +34,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const OPTION_BITLY_APIKEY            = 'wp-autosharepost-bitly-apikey';
     const OPTION_BITLY_LOGIN             = 'wp-autosharepost-bitly-login';
     
+	const OPTION_COMMENT_GRAB_INTERVAL 	 = 'wp-autosharepost-commentgrabber-interval';
+    
     const META_ENABLED                   = 'wp-autosharepost-enabled';
     const META_FACEBOOK_TEXT             = 'wp-autosharepost-fb-text';
     const META_FACEBOOK_POST			 = 'wp-autosharepost-fb-post-id';
     const META_COMMENT_FACEBOOK_ID		 = 'wp-autosharepost-fb-comment-id';
+    const META_COMMENT_FACEBOOK_USER	 = 'wp-autosharepost-fb-comment-user';
     const META_TWITTER_TEXT              = 'wp-autosharepost-twitter-text';
     const META_TWITTER_POST				 = 'wp-autosharepost-twitter-post-id';
     const META_TWITTER_POST_USER		 = 'wp-autosharepost-twitter-post-user';
@@ -79,8 +82,10 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     public function __construct()
     {
-        add_action('init', array(&$this, 'actionInit'));
-        add_action('admin_init', array(&$this, 'actionAdminInit'));
+    	if (is_admin() || defined('DOING_CRON')) {
+	        add_action('init', array(&$this, 'actionInit'));
+	        add_action('admin_init', array(&$this, 'actionAdminInit'));
+    	}
     }
 
     /**
@@ -91,6 +96,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         add_action('admin_menu',          array(&$this, 'hookAdminMenu'));
         add_action('publish_post',        array(&$this, 'hookPublishPost'));
         add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
+        
+        add_action('wp_autosharepost_comment_grabber', array(&$this, 'cronCommentGrabber'));
     }
     
     /**
@@ -336,19 +343,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         									   TRUE,
         									   'wp-autosharepost-settings',
         									   array(&$this, 'actionSettings'));
-        
-        // Add a configuration page for the comment grabber
-        $pageCommentGrabber = add_options_page('AutoSharePost CommentGrabber',
-        									   'CommentGrabber',
-        									   TRUE,
-        									   'wp-autosharepost-comments',
-        									   array(&$this, 'actionCommentGrabber'));
-        /*
-        global $menu;
-        global $submenu;
-        if ( isset($submenu['wp-autosharepost']) )
-            $submenu['wp-autosharepost'][0][0] = __( 'Overview', WP_AUTOSHAREPOST_DOMAIN);
-        */
     }
 
     /**
@@ -421,7 +415,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 $this->_tpl->facebookError = $e->getMessage();
             }
         }
-
         
         // General options
         $this->_tpl->autoEnabled         = get_option(self::OPTION_AUTOENABLED, '');
@@ -453,7 +446,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->render('settings/index');
     }
     
-    public function actionCommentGrabber()
+    /**
+     * Grabs all comments from Facebook
+     *
+     * This method reads the feed of a page and grabs all the comments written by
+     * other users.
+     *
+     * @throws Exception
+     */
+    public function cronCommentGrabber()
     {
     	global $wpdb;
     	
@@ -463,53 +464,58 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $fb = $this->_getFacebookInstance();
         $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, ''));
         
-        $fb_result = $fb->api('/' . $pageId . '/feed');
-        var_dump($fb_result);
+        $fb_result = $fb->api('/' . $pageId . '/feed/');
         
         if (is_array($fb_result['data'])) {
+        	// Iterate over all posts
 	        foreach ($fb_result['data'] as $post) {
 	        	if (!isset($post['comments']['count'])) continue;
 	        	if ($post['comments']['count'] == 0) continue;
 	        	
-	        	var_dump($post);
 	        	$post_id = explode('_', $post['id']);
 	        	
+	        	// Try to find the attached blog post
 			    $row = $wpdb->get_row("SELECT * "
-			        				 ."FROM $wpdb->post_meta "
+			        				 ."FROM $wpdb->postmeta "
 			        			 	 ."WHERE meta_key = '" . self::META_FACEBOOK_POST . "' "
 			        				 ."AND   meta_value = '" . $post_id[1] . "'");
 			    
+			    // Only go on if we found the post for which this comment was
 			    if ($row->post_id > 0) {
 			    	$comment_post = get_post($row->post_id);
 			    	
+			    	// Iterate over all comments
 			    	foreach ($post['comments']['data'] as $comment) {
 			    		$comment_row = $wpdb->get_row("SELECT * "
 				    						 		 ."FROM $wpdb->commentmeta "
 				    						 		 ."WHERE meta_key = '" . self::META_COMMENT_FACEBOOK_ID . "' "
 				    						 		 ."AND   meta_value = '" . $comment['id'] . "'");
-			    		var_dump('COMMENT ' . $comment['id']);
-			    		if ($comment_row->comment_ID > 0) continue;
+
+			    		// Check if we already have this comment in our database
+			    		if ($comment_row->comment_id > 0) continue;
 			    		
+			    		// Create a new comment
 			    		$new_comment = array(
-				    		'comment_post_ID' => $row->post_id,
-				    		'comment_author' => $comment['from']['name'],
-				    		'comment_author_email' => '',
-				    		'comment_author_url' => '',
-				    		'comment_content' => $comment['message'],
-				    		'comment_type' => '',
-				    		'comment_parent' => 0,
-				    		'user_id' => 0,
-				    		'comment_author_IP' => '127.0.0.1',
-				    		'comment_agent' => 'FacebookCommentGrabber|' . $comment['id'],
-				    		'comment_date' => $comment['time'],
-				    		'comment_approved' => 0,
+				    		'comment_post_ID' 		=> $row->post_id,
+				    		'comment_author' 		=> $comment['from']['name'],
+				    		'comment_author_email' 	=> '',
+				    		'comment_author_url' 	=> '',
+				    		'comment_content' 		=> $comment['message'],
+				    		'comment_type' 			=> 'facebook',
+				    		'comment_parent' 		=> 0,
+				    		'user_id' 				=> 0,
+				    		'comment_author_IP' 	=> '127.0.0.1',
+				    		'comment_agent' 		=> 'FacebookCommentGrabber|' . $comment['id'],
+				    		'comment_date' 			=> date('Y-m-d H:i:s', strtotime($comment['created_time'])),
+				    		'comment_approved' 		=> 0,
 			    		);
 			    		
-			    		var_dump('NEW COMMENT FOUND');
-			    		
+			    		// Save the comment and the facebook comment id for reference
 			    		$comment_id = wp_new_comment($new_comment);
-			    		add_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_ID, $comment['id'], TRUE);
+			    		update_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_ID, 	$comment['id'], TRUE);
+			    		update_comment_meta($comment_id, self::META_COMMENT_FACEBOOK_USER, 	$comment['from']['id'], TRUE);
 			    		
+			    		// Update the comment count for this post
 			    		wp_update_comment_count($comment_id);
 			    	}
 			    }
@@ -573,7 +579,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             $words = preg_split('/[\s]+/', $post->post_content, NULL, PREG_SPLIT_DELIM_CAPTURE);
             $text = strip_tags(implode(' ', array_slice($words, 0, get_option(self::OPTION_FACEBOOK_DESCRIPTION, 20))));
             
-            $params = array(
+            $facebook = array(
                 'message'     => get_post_meta($post_id, self::META_FACEBOOK_TEXT, TRUE),
                 'link'        => ($disableBitly == '1') ? $permalink : $bitlyUrl,
             	'name'	 	  => $post->post_title,
@@ -583,7 +589,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             
             $accessToken = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
             
-            if (empty($error)) {
+            if (empty($error) && !empty($facebook['message'])) {
                 if (!empty($accessToken)) {
                 	// Get an instance and set the corresponding access token
                     $fb = $this->_getFacebookInstance();
@@ -597,7 +603,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     
                     try {
                     	// Share this post and save the post id in a meta field
-                        $fb_result = $fb->api('/' . $profileId . '/links', 'POST', $params);
+                        $fb_result = $fb->api('/' . $profileId . '/links', 'POST', $facebook);
                         update_post_meta($post_id, self::META_FACEBOOK_POST, $fb_result['id']);
                     } catch(Exception $e) {
                         $error = sprintf(__('Could not post on facebook.com. Reason: %1$s'), $e->getMessage());
@@ -607,15 +613,19 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 }
             }
             
+            $twitter = array(
+            	'message' => get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE)
+            );
+            
             // Tweet on twitter.com
-            if (empty($error)) {
+            if (empty($error) && !empty($twitter['message'])) {
                 $seperator = get_option(self::OPTION_TWITTER_URL_SEPERATOR, NULL);
                 if (empty($seperator)) $seperator = ' ';
                 
                 // Tweet this on twitter
                 $tw = $this->_getTwitterInstance();
                 $tw_result = $tw->post('statuses/update', array(
-                    'status' => get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE) . $seperator . $bitlyUrl
+                    'status' => $twitter['message'] . $seperator . $bitlyUrl
                 ));
                 
                 // Check for any errors

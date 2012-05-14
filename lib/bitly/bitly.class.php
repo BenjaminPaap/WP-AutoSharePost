@@ -109,6 +109,12 @@ class Bitly
         return json_decode($return);
     }
 
+    /**
+     * Prepares a curl request
+     *
+     * @param string $url
+     * @return resource
+     */
     protected function _prepareCurl($url)
     {
         $ch = curl_init();
@@ -123,6 +129,11 @@ class Bitly
         return $ch;
     }
     
+    /**
+     * Executes a curl request
+     *
+     * @param resource $ch
+     */
     protected function _curlExecute($ch)
     {
         $return = curl_exec($ch);
