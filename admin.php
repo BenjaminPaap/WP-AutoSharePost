@@ -193,9 +193,16 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         }
         
         if ($this->_bitly === NULL) {
-            $this->_bitly = new Bitly();
-            $this->_bitly->setApiKey(get_option(self::OPTION_BITLY_APIKEY, NULL));
-            $this->_bitly->setLogin(get_option(self::OPTION_BITLY_LOGIN, NULL));
+        	$api_key = get_option(self::OPTION_BITLY_APIKEY, NULL);
+        	$login = get_option(self::OPTION_BITLY_LOGIN, NULL);
+        	
+        	if ($api_key !== NULL && $login !== NULL) {
+	            $this->_bitly = new Bitly();
+	            $this->_bitly->setApiKey($api_key);
+	            $this->_bitly->setLogin($login);
+        	} else {
+        		$this->_bitly = FALSE;
+        	}
         }
         
         return $this->_bitly;
@@ -210,7 +217,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     public function hookAddMetaBoxes()
     {
         add_meta_box('wp-autosharepost-text',
-                __('AutoSharePost', WP_AUTOSHAREPOST_DOMAIN),
+                __('WP-AutoSharePost', WP_AUTOSHAREPOST_DOMAIN),
                 array(&$this, 'hookMetaBoxText'),
                 'post',
                 'normal');
@@ -343,14 +350,14 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
     	// Add the main settings page
         $pageSettings 		= add_options_page('AutoSharePost Settings',
-        									   'AutoSharePosts',
+        									   __('WP-AutoSharePosts', WP_AUTOSHAREPOST_DOMAIN),
         									   TRUE,
         									   'wp-autosharepost-settings',
         									   array(&$this, 'actionAutoSharePostSettings'));
         
     	// Add the CommentGrabber settings page
         $pageSettings 		= add_options_page('CommentGrabber Settings',
-        									   'CommentGrabber',
+        									   __('CommentGrabber', WP_AUTOSHAREPOST_DOMAIN),
         									   TRUE,
         									   'wp-autosharepost-commentgrabber',
         									   array(&$this, 'actionCommentGrabberSettings'));
@@ -613,13 +620,16 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             
             // Generate a new bitly url
             if (empty($bitlyUrl)) {
-                $bitly = $this->_getBitlyInstance();
-                $bitly_result = $bitly->shorten(array(
-                    'longUrl' => $permalink
-                ));
-                
-                $bitlyUrl = $bitly_result->data->url;
-                update_post_meta($post_id, self::META_BITLY_URL, $bitlyUrl);
+                if ($bitly = $this->_getBitlyInstance()) {
+	                $bitly_result = $bitly->shorten(array(
+	                    'longUrl' => $permalink
+	                ));
+	                
+	                $bitlyUrl = $bitly_result->data->url;
+	                update_post_meta($post_id, self::META_BITLY_URL, $bitlyUrl);
+                } else {
+                	$bitlyUrl = $permalink;
+                }
             }
             
             $picture = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'large');

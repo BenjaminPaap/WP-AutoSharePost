@@ -1,0 +1,235 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wordpress-autosharepost\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-05-24 17:29+0100\n"
+"PO-Revision-Date: 2012-05-24 17:30+0100\n"
+"Last-Translator: Benjamin Paap <benjamin.paap@googlemail.com>\n"
+"Language-Team: benjaminpaap.com <benjamin.paap@googlemail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: C:\\Entwicklung\\Web\\xampp\\htdocs\\wordpress\\wp-content\\plugins\\wordpress-autosharepost\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin.php:213
+#, fuzzy
+msgid "WP-AutoSharePost"
+msgstr "WP-AutoSharePost"
+
+#: admin.php:346
+msgid "WP-AutoSharePosts"
+msgstr "WP-AutoSharePost"
+
+#: admin.php:353
+msgid "CommentGrabber"
+msgstr "CommentGrabber"
+
+#: admin.php:420
+#, php-format
+msgid "Could not find any app associated with this user with appId \"%1$s\"."
+msgstr "Eine Applikation mit der AppId \"%1$s\" konnte für diesen Benutzer nicht gefunden werden."
+
+#: admin.php:423
+msgid "\"data\" member in wrong format."
+msgstr "\"data\" ist im falschen Format."
+
+#: admin.php:575
+msgid "Could not load data from facebook."
+msgstr "Daten von Facebook konnten nicht geladen werden."
+
+#: admin.php:660
+#, php-format
+msgid "Could not post on facebook.com. Reason: %1$s"
+msgstr "Beitrag konnte nicht auf Facebook.com gepostet werden. Grund: %1$s"
+
+#: admin.php:663
+msgid "Could not post on facebook.com \"AccessToken\" missing"
+msgstr "Auf Facebook.com kann nicht gepostet werden. Es gibt noch keinen \"AccessToken\"."
+
+#: wp-autosharepost.php:116
+msgid "WP-AutoSharePost Interval"
+msgstr "WP-AutoSharePost Interval"
+
+#: tpl/metabox/text.phtml:2
+msgid "Post shared"
+msgstr "Beitrag geteilt"
+
+#: tpl/metabox/text.phtml:7
+msgid "Post was shared on"
+msgstr "Beitrag wurde geteilt am"
+
+#: tpl/metabox/text.phtml:15
+msgid "Posting Links"
+msgstr "Beitragslinks"
+
+#: tpl/metabox/text.phtml:22
+msgid "View Post on Facebook"
+msgstr "Beitrag auf Facebook ansehen"
+
+#: tpl/metabox/text.phtml:27
+msgid "View Post on Twitter"
+msgstr "Beitrag auf Twitter ansehen"
+
+#: tpl/metabox/text.phtml:32
+msgid "Re-Share this Post"
+msgstr "Beitrag erneut teilen"
+
+#: tpl/metabox/text.phtml:44
+msgid "Social Network Post Messages"
+msgstr "Nachrichten für soziale Netzwerke"
+
+#: tpl/metabox/text.phtml:49
+msgid "Enable AutoSharePost"
+msgstr "WP-AutoSharePost aktivieren"
+
+#: tpl/metabox/text.phtml:57
+msgid "Facebook Message"
+msgstr "Facebook Nachricht"
+
+#: tpl/metabox/text.phtml:65
+msgid "Twitter Message"
+msgstr "Twitter Nachricht"
+
+#: tpl/metabox/text.phtml:70
+msgid "Characters left"
+msgstr "Zeichen übrig"
+
+#: tpl/settings/comment-grabber.phtml:3
+msgid "Settings › AutoSharePost"
+msgstr "Einstellungen › AutoSharePost"
+
+#: tpl/settings/comment-grabber.phtml:11
+#: tpl/settings/index.phtml:11
+msgid "General Settings"
+msgstr "Allgemeine Einstellungen"
+
+#: tpl/settings/comment-grabber.phtml:17
+msgid "Enable CommentGrabber"
+msgstr "CommentGrabber aktivieren"
+
+#: tpl/settings/comment-grabber.phtml:25
+msgid "Interval"
+msgstr "Interval"
+
+#: tpl/settings/comment-grabber.phtml:29
+msgid "Minutes"
+msgstr "Minuten"
+
+#: tpl/settings/comment-grabber.phtml:34
+msgid "Auto-Approve new Comments"
+msgstr "Neue Kommentare sofort freigeben"
+
+#: tpl/settings/comment-grabber.phtml:43
+#: tpl/settings/index.phtml:178
+msgid "Save Changes"
+msgstr "Änderungen speichern"
+
+#: tpl/settings/index.phtml:3
+msgid "Settings › WP-AutoSharePost"
+msgstr "Einstellungen › WP-AutoSharePost"
+
+#: tpl/settings/index.phtml:17
+msgid "Enable WP-AutoSharePost"
+msgstr "WP-AutoSharePost aktivieren"
+
+#: tpl/settings/index.phtml:26
+msgid "Facebook Settings"
+msgstr "Facebook Einstellungen"
+
+#: tpl/settings/index.phtml:29
+msgid "Facebook Error"
+msgstr "Facebook Fehler"
+
+#: tpl/settings/index.phtml:36
+msgid "App/Page Name"
+msgstr "App/Seiten Name"
+
+#: tpl/settings/index.phtml:44
+msgid "App ID"
+msgstr ""
+
+#: tpl/settings/index.phtml:52
+msgid "App Secret"
+msgstr ""
+
+#: tpl/settings/index.phtml:60
+msgid "Page ID"
+msgstr "Seiten ID"
+
+#: tpl/settings/index.phtml:65
+msgid "<strong>Optional</strong> Only if you want to manage a page"
+msgstr "<strong>Optional</strong> Nur eintragen, wenn Sie eine Facebook Seite verwalten möchten."
+
+#: tpl/settings/index.phtml:70
+msgid "Token"
+msgstr ""
+
+#: tpl/settings/index.phtml:75
+msgid "Request Facebook Access-Token"
+msgstr "Facebook Access-Token erzeugen"
+
+#: tpl/settings/index.phtml:80
+msgid "Wordcount for description"
+msgstr "Wortanzahl für die Beschreibung"
+
+#: tpl/settings/index.phtml:85
+msgid "This defines the maximum wordcount for the description text of facebook status messages"
+msgstr "Die maximale Anzahl Wörter, welche in einer Facebook Status Nachricht angezeigt werden sollen."
+
+#: tpl/settings/index.phtml:91
+msgid "Disable Bit.ly URL Shortening"
+msgstr "bit.ly Service deaktivieren"
+
+#: tpl/settings/index.phtml:101
+msgid "Twitter Settings"
+msgstr "Twitter Einstellungen"
+
+#: tpl/settings/index.phtml:107
+msgid "Consumer Key"
+msgstr ""
+
+#: tpl/settings/index.phtml:115
+msgid "Consumer Secret"
+msgstr ""
+
+#: tpl/settings/index.phtml:123
+msgid "OAuth Token"
+msgstr ""
+
+#: tpl/settings/index.phtml:131
+msgid "OAuth Secret"
+msgstr ""
+
+#: tpl/settings/index.phtml:139
+msgid "Seperator between Text and URL"
+msgstr "Trenner zwischen Text und URL"
+
+#: tpl/settings/index.phtml:143
+msgid "Whitespace"
+msgstr "Leerzeichen"
+
+#: tpl/settings/index.phtml:144
+msgid "As defined:"
+msgstr "Wie definiert:"
+
+#: tpl/settings/index.phtml:147
+msgid "The seperator which is used to seperate the URL from the text in a Twitter tweet."
+msgstr "Das Trennzeichen, welches zwischen Text und URL liegt, um dies voneinander in einer Twitter Nachricht zu trennen."
+
+#: tpl/settings/index.phtml:154
+msgid "Bit.ly Url Shortening"
+msgstr "Bit.ly URL Kürzung"
+
+#: tpl/settings/index.phtml:160
+msgid "Login"
+msgstr ""
+
+#: tpl/settings/index.phtml:168
+msgid "API Key"
+msgstr ""
+

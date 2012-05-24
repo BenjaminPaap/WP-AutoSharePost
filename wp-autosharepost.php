@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Wordpress-AutoSharePost
-Plugin URI: http://www.checkdomain.de/wordpress/autosharepost
+Plugin URI: http://www.wordpress.org/extend/plugins/wordpress-autosharepost/
 Description: Automatically posts published posts on social platforms with a predefined text per post
 Version: 0.1.1
 Author: Benjamin Paap
@@ -29,7 +29,9 @@ class WordpressAutoSharePost
      */
     public function init()
     {
-		register_activation_hook(__FILE__, array(&$this, 'activatePlugin'));
+    	load_plugin_textdomain(WP_AUTOSHAREPOST_DOMAIN, false, basename(dirname(__FILE__)) . '/languages' );
+		
+    	register_activation_hook(__FILE__, array(&$this, 'activatePlugin'));
 		register_deactivation_hook(__FILE__, array(&$this, 'deactivatePlugin'));
 		
 		add_filter('get_avatar_comment_types', array(&$this, 'filterAvatarCommentTypes'));
