@@ -16,4 +16,14 @@ jQuery(document).ready(function() {
 		
 		jQuery('#wasp-twitter-characters-left').html(left);
 	}).keyup();
+	
+	jQuery('#wasp-twitter-url-seperator').bind('change click', function(e) {
+		var element = jQuery('#wasp-twitter-url-seperator-text');
+		
+		if (jQuery(this).val() == 'user-defined') {
+			element.show();
+		} else {
+			element.hide();
+		}
+	}).click();
 });

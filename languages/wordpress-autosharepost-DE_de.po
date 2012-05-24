@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wordpress-autosharepost\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 17:29+0100\n"
-"PO-Revision-Date: 2012-05-24 17:30+0100\n"
+"POT-Creation-Date: 2012-05-24 20:29+0100\n"
+"PO-Revision-Date: 2012-05-24 20:30+0100\n"
 "Last-Translator: Benjamin Paap <benjamin.paap@googlemail.com>\n"
 "Language-Team: benjaminpaap.com <benjamin.paap@googlemail.com>\n"
 "MIME-Version: 1.0\n"
@@ -16,38 +16,46 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: admin.php:213
+#: admin.php:221
 #, fuzzy
 msgid "WP-AutoSharePost"
 msgstr "WP-AutoSharePost"
 
-#: admin.php:346
+#: admin.php:347
+msgid "WP-AutoSharePost Settings"
+msgstr "WP-AutoSharePost Einstellungen"
+
+#: admin.php:348
 msgid "WP-AutoSharePosts"
 msgstr "WP-AutoSharePost"
 
-#: admin.php:353
+#: admin.php:354
+msgid "CommentGrabber Settings"
+msgstr "CommentGrabber Einstellungen"
+
+#: admin.php:355
 msgid "CommentGrabber"
 msgstr "CommentGrabber"
 
-#: admin.php:420
+#: admin.php:429
 #, php-format
 msgid "Could not find any app associated with this user with appId \"%1$s\"."
 msgstr "Eine Applikation mit der AppId \"%1$s\" konnte für diesen Benutzer nicht gefunden werden."
 
-#: admin.php:423
+#: admin.php:432
 msgid "\"data\" member in wrong format."
 msgstr "\"data\" ist im falschen Format."
 
-#: admin.php:575
+#: admin.php:587
 msgid "Could not load data from facebook."
 msgstr "Daten von Facebook konnten nicht geladen werden."
 
-#: admin.php:660
+#: admin.php:661
 #, php-format
 msgid "Could not post on facebook.com. Reason: %1$s"
 msgstr "Beitrag konnte nicht auf Facebook.com gepostet werden. Grund: %1$s"
 
-#: admin.php:663
+#: admin.php:664
 msgid "Could not post on facebook.com \"AccessToken\" missing"
 msgstr "Auf Facebook.com kann nicht gepostet werden. Es gibt noch keinen \"AccessToken\"."
 
@@ -125,7 +133,7 @@ msgid "Auto-Approve new Comments"
 msgstr "Neue Kommentare sofort freigeben"
 
 #: tpl/settings/comment-grabber.phtml:43
-#: tpl/settings/index.phtml:178
+#: tpl/settings/index.phtml:195
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -174,62 +182,86 @@ msgid "Request Facebook Access-Token"
 msgstr "Facebook Access-Token erzeugen"
 
 #: tpl/settings/index.phtml:80
+msgid "Posting Type"
+msgstr "Beitragstyp"
+
+#: tpl/settings/index.phtml:84
+msgid "Status Message"
+msgstr "Statusmeldung"
+
+#: tpl/settings/index.phtml:85
+msgid "Shared Link"
+msgstr "Link"
+
+#: tpl/settings/index.phtml:88
+msgid "Specify whether to post a link or a status message on facebook."
+msgstr "Soll die Facebook Nachricht als Statusmeldung oder Link gepostet werden."
+
+#: tpl/settings/index.phtml:94
 msgid "Wordcount for description"
 msgstr "Wortanzahl für die Beschreibung"
 
-#: tpl/settings/index.phtml:85
+#: tpl/settings/index.phtml:99
 msgid "This defines the maximum wordcount for the description text of facebook status messages"
 msgstr "Die maximale Anzahl Wörter, welche in einer Facebook Status Nachricht angezeigt werden sollen."
 
-#: tpl/settings/index.phtml:91
+#: tpl/settings/index.phtml:105
 msgid "Disable Bit.ly URL Shortening"
 msgstr "bit.ly Service deaktivieren"
 
-#: tpl/settings/index.phtml:101
+#: tpl/settings/index.phtml:115
 msgid "Twitter Settings"
 msgstr "Twitter Einstellungen"
 
-#: tpl/settings/index.phtml:107
+#: tpl/settings/index.phtml:121
 msgid "Consumer Key"
 msgstr ""
 
-#: tpl/settings/index.phtml:115
+#: tpl/settings/index.phtml:129
 msgid "Consumer Secret"
 msgstr ""
 
-#: tpl/settings/index.phtml:123
+#: tpl/settings/index.phtml:137
 msgid "OAuth Token"
 msgstr ""
 
-#: tpl/settings/index.phtml:131
+#: tpl/settings/index.phtml:145
 msgid "OAuth Secret"
 msgstr ""
 
-#: tpl/settings/index.phtml:139
+#: tpl/settings/index.phtml:153
 msgid "Seperator between Text and URL"
 msgstr "Trenner zwischen Text und URL"
 
-#: tpl/settings/index.phtml:143
+#: tpl/settings/index.phtml:157
 msgid "Whitespace"
 msgstr "Leerzeichen"
 
-#: tpl/settings/index.phtml:144
+#: tpl/settings/index.phtml:158
 msgid "As defined:"
 msgstr "Wie definiert:"
 
-#: tpl/settings/index.phtml:147
+#: tpl/settings/index.phtml:160
+msgid "Put your seperator here"
+msgstr "Trenner hier einsetzen"
+
+#: tpl/settings/index.phtml:162
 msgid "The seperator which is used to seperate the URL from the text in a Twitter tweet."
 msgstr "Das Trennzeichen, welches zwischen Text und URL liegt, um dies voneinander in einer Twitter Nachricht zu trennen."
 
-#: tpl/settings/index.phtml:154
+#: tpl/settings/index.phtml:169
 msgid "Bit.ly Url Shortening"
 msgstr "Bit.ly URL Kürzung"
 
-#: tpl/settings/index.phtml:160
+#: tpl/settings/index.phtml:171
+msgid "Bit.ly is a URL shortening service. This is used to shorten the URL to your Blogpost so that the URL does not consume too many characters from the twitter message itself."
+msgstr "Bit.ly ist ein URL Kürzungsservice, welcher aus einer langen URL eine kurze macht. Solche werden für Twitter benutzt, damit nicht zu viele Zeichen durch die URL verbraucht werden."
+
+#: tpl/settings/index.phtml:177
 msgid "Login"
 msgstr ""
 
-#: tpl/settings/index.phtml:168
+#: tpl/settings/index.phtml:185
 msgid "API Key"
 msgstr ""
 

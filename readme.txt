@@ -1,10 +1,10 @@
 === WP-AutoSharePost ===
 Contributors: Benjamin Paap
 Donate link: http://www.benjaminpaap.com
-Tags: facebook, share, twitter, comments, grab, grabber
-Requires at least: 3.3
+Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
+Requires at least: 3.0
 Tested up to: 3.4
-Stable tag: 0.1
+Stable tag: 0.2
 
 This plugin automatically shares posts to facebook and twitter with predefined
 messages and grabs the facebook comments.
@@ -33,6 +33,7 @@ files and put them in a new folder e.g.: /wp-content/plugins/wp-autosharepost/
 Just follow these steps to get things working for each of these social networks
 
 = Facebook =
+
 1. Visit [developers.facebook.com](https://developers.facebook.com/apps) and create a new application
 2. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
 3. Copy and paste the "App ID" and "App Secret" shown on facebook for your application 
@@ -46,6 +47,7 @@ Just follow these steps to get things working for each of these social networks
    you're ready to share posts on Facebook.
 
 = CommentGrabber =
+
 1. To enable the Facebook CommentGrabber just visit the plugin settings page under
    http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-commentgrabber
 2. Check "Enable CommentGrabber" to enable the CommentGrabber.
@@ -59,6 +61,7 @@ Just follow these steps to get things working for each of these social networks
    Facebook requests may take some time to finish.
 
 = Twitter =
+
 1. Visit [dev.twitter.com](https://dev.twitter.com/apps/new) and create a new app
 2. Click on the "Settings"-Tab and locate "Application Type". Here you have to
    change the "Access"-Level to "Read and Write". Save these settings.

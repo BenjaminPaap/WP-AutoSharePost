@@ -77,6 +77,20 @@
                 </tr>
                 <tr valign="top">
                     <th scope="row">
+                        <label for="wasp-fb-posting-type"><?php echo __('Posting Type', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <select id="wasp-fb-posting-type" name="autosharepost[facebook][type]">
+                        	<option value="status" <?php echo ($this->facebookPostingType == 'status') ? 'selected="selected"' : '' ?>><?php echo __('Status Message', WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        	<option value="link" <?php echo ($this->facebookPostingType == 'link') ? 'selected="selected"' : '' ?>><?php echo __('Shared Link', WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        </select>
+                        <p>
+                        	<?php echo __('Specify whether to post a link or a status message on facebook.', WP_AUTOSHAREPOST_DOMAIN) ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
                         <label for="wasp-fb-description-words"><?php echo __('Wordcount for description', WP_AUTOSHAREPOST_DOMAIN) ?></label>
                     </th>
                     <td>
@@ -143,6 +157,7 @@
                             <option value=" "<?php echo ($this->twitterUrlSeperator == ' ') ? ' selected="selected"' : '' ?>><?php echo __('Whitespace', WP_AUTOSHAREPOST_DOMAIN); ?></option>
                             <option value="user-defined"<?php echo ($this->twitterUrlSeperator != ' ' && !empty($this->twitterUrlSeperator)) ? ' selected="selected"' : '' ?>><?php echo __('As defined:', WP_AUTOSHAREPOST_DOMAIN); ?></option>
                         </select>
+                        <input id="wasp-twitter-url-seperator-text" type="text" value="<?php echo ($this->twitterUrlSeperator != ' ') ? $this->twitterUrlSeperator : '' ?>" name="autosharepost[twitter][url_seperator_text]" placeholder="<?php echo __('Put your seperator here', WP_AUTOSHAREPOST_DOMAIN) ?>" />
                         <p>
                         	<?php echo __('The seperator which is used to seperate the URL from the text in a Twitter tweet.', WP_AUTOSHAREPOST_DOMAIN); ?>
                         </p>

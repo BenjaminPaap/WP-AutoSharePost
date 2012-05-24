@@ -3,7 +3,7 @@
 Plugin Name: Wordpress-AutoSharePost
 Plugin URI: http://www.wordpress.org/extend/plugins/wordpress-autosharepost/
 Description: Automatically posts published posts on social platforms with a predefined text per post
-Version: 0.1.1
+Version: 0.2.1
 Author: Benjamin Paap
 Author URI: http://www.benjaminpaap.de
 License:
@@ -129,6 +129,15 @@ class WordpressAutoSharePost
     {
     	if (!wp_next_scheduled('wp_autosharepost_comment_grabber')) {
     		wp_schedule_event(time(), 'wp-autosharepost-interval', 'wp_autosharepost_comment_grabber');
+    	}
+    	
+    	$defaults = array(
+    		WordpressAutoSharePostAdmin::OPTION_FACEBOOK_POSTINGTYPE => 'link',
+    		WordpressAutoSharePostAdmin::OPTION_FACEBOOK_DESCRIPTION => 40,
+    	);
+    	
+    	foreach ($defaults as $key => $default) {
+    		update_option($key, get_option($key, $default));
     	}
     }
     
