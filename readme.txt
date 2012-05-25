@@ -59,14 +59,14 @@ Just follow these steps to get things working for each of these social networks
 5. Now copy and paste all needed settings. You need the "**Consumer key**", 
    "**Consumer Secret**", "**Access token**" and "**Access token secret**" to tweet your posts
 
-= Bit.ly ==
+= Bit.ly =
 
 In order to support URL shortening for your twitter links you should enable bit.ly 
 by supporting the plugin with some valid login details.
 
 1. Visit [bitly.com](https://bitly.com/) and sign up. If you are already registered
    log in now.
-2. Enter your bit.ly username in the corresponing field in the plugin settings 
+2. Enter your bit.ly username in the corresponding field in the plugin settings 
    page.
 2. Visit http://bitly.com/a/account and scroll down until you reach the "**API Key**"
    headline. Copy and paste this code to the plugin settings page.
