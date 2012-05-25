@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wordpress-autosharepost\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 20:29+0100\n"
-"PO-Revision-Date: 2012-05-24 20:30+0100\n"
+"POT-Creation-Date: 2012-05-24 21:02+0100\n"
+"PO-Revision-Date: 2012-05-24 22:02+0100\n"
 "Last-Translator: Benjamin Paap <benjamin.paap@googlemail.com>\n"
 "Language-Team: benjaminpaap.com <benjamin.paap@googlemail.com>\n"
 "MIME-Version: 1.0\n"
@@ -50,12 +50,12 @@ msgstr "\"data\" ist im falschen Format."
 msgid "Could not load data from facebook."
 msgstr "Daten von Facebook konnten nicht geladen werden."
 
-#: admin.php:661
+#: admin.php:675
 #, php-format
 msgid "Could not post on facebook.com. Reason: %1$s"
 msgstr "Beitrag konnte nicht auf Facebook.com gepostet werden. Grund: %1$s"
 
-#: admin.php:664
+#: admin.php:678
 msgid "Could not post on facebook.com \"AccessToken\" missing"
 msgstr "Auf Facebook.com kann nicht gepostet werden. Es gibt noch keinen \"AccessToken\"."
 

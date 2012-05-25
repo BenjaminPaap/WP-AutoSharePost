@@ -67,6 +67,10 @@ to share posts to Google+ as well.
 If you have any whishes for more social networks/platforms to be included feel 
 free to contact me at benjamin.paap@googlemail.com
 
+Plugin Homepage
+---------------
+The plugin can also be found under http://benjaminpaap.de/entwicklungen/wp-autosharepost/
+
 Special Thanks
 --------------
 Special thanks go out to all employees at Checkdomain GmbH visit www.checkdomain.de

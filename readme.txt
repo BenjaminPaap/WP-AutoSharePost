@@ -1,10 +1,12 @@
 === WP-AutoSharePost ===
+
 Contributors: Benjamin Paap
 Donate link: http://www.benjaminpaap.com
 Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
 Requires at least: 3.0
 Tested up to: 3.4
 Stable tag: 0.2
+License: GPLv2 or later
 
 This plugin automatically shares posts to facebook and twitter with predefined
 messages and grabs the facebook comments.
@@ -70,6 +72,36 @@ Just follow these steps to get things working for each of these social networks
 4. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
 5. Now copy and paste all needed settings. You need the "Consumer key", 
    "Consumer Secret", "Access token" and "Access token secret" to tweet your posts
+
+== Upgrade Notice ==
+
+Everything should work fine during upgrade. There is nothing special to think of.
+
+== Changelog ==
+
+Here you'll find important notices and our change log.
+
+= 0.2.2 =
+
+
+= 0.2.1 =
+
+ - ADDED: German language files
+ - ADDED: Option to specify what type of message to share to facebook (link/status message)
+ - FIX: When a Blogpost is created and directly published no messages were shared 
+   to social networks. 
+
+= 0.1.1 =
+
+ - Initial Release of this plugin
+
+== Screenshots ==
+
+
+
+== Frequently Asked Questions ==
+
+None yet.
 
 == Feedback ==
 
