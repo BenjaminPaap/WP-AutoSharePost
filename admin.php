@@ -13,44 +13,44 @@ require_once(WP_AUTOSHAREPOST_DIR . '/lib/cd-wordpress-base.php');
 class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 {
 
-	const PLUGIN_STYLE_NAME_MAIN		 = 'wp-autosharepost-style-main';
+	const PLUGIN_STYLE_NAME_MAIN		  = 'wp-autosharepost-style-main';
 	
-    const OPTION_AUTOENABLED             = 'wp-autosharepost-autoenabled';
+    const OPTION_AUTOENABLED              = 'wp-autosharepost-autoenabled';
     
-    const OPTION_FACEBOOK_APPID          = 'wp-autosharepost-fb-appid';
-    const OPTION_FACEBOOK_APPSECRET      = 'wp-autosharepost-fb-appsecret';
-    const OPTION_FACEBOOK_PAGEID         = 'wp-autosharepost-fb-pageid';
-    const OPTION_FACEBOOK_APPNAME        = 'wp-autosharepost-fb-appname';
-    const OPTION_FACEBOOK_TOKEN          = 'wp-autosharepost-fb-token';
-    const OPTION_FACEBOOK_POSTINGTYPE	 = 'wp-autosharepost-fb-postingtype';
-    const OPTION_FACEBOOK_DESCRIPTION	 = 'wp-autosharepost-fb-description';
-    const OPTION_FACEBOOK_DISABLE_BITLY  = 'wp-autosharepost-fb-disablebitly';
+    const OPTION_FACEBOOK_APPID           = 'wp-autosharepost-fb-appid';
+    const OPTION_FACEBOOK_APPSECRET       = 'wp-autosharepost-fb-appsecret';
+    const OPTION_FACEBOOK_PAGEID          = 'wp-autosharepost-fb-pageid';
+    const OPTION_FACEBOOK_APPNAME         = 'wp-autosharepost-fb-appname';
+    const OPTION_FACEBOOK_TOKEN           = 'wp-autosharepost-fb-token';
+    const OPTION_FACEBOOK_POSTINGTYPE	  = 'wp-autosharepost-fb-postingtype';
+    const OPTION_FACEBOOK_DESCRIPTION	  = 'wp-autosharepost-fb-description';
+    const OPTION_FACEBOOK_DISABLE_BITLY   = 'wp-autosharepost-fb-disablebitly';
     
-    const OPTION_TWITTER_CONSUMER_KEY    = 'wp-autosharepost-twitter-consumer-key';
-    const OPTION_TWITTER_CONSUMER_SECRET = 'wp-autosharepost-twitter-consumer-secret';
-    const OPTION_TWITTER_OAUTH_TOKEN     = 'wp-autosharepost-twitter-oauth-token';
-    const OPTION_TWITTER_OAUTH_SECRET    = 'wp-autosharepost-twitter-oauth-secret';
-    const OPTION_TWITTER_URL_SEPERATOR   = 'wp-autosharepost-twitter-oauth-url-seperator';
+    const OPTION_TWITTER_CONSUMER_KEY     = 'wp-autosharepost-twitter-consumer-key';
+    const OPTION_TWITTER_CONSUMER_SECRET  = 'wp-autosharepost-twitter-consumer-secret';
+    const OPTION_TWITTER_OAUTH_TOKEN      = 'wp-autosharepost-twitter-oauth-token';
+    const OPTION_TWITTER_OAUTH_SECRET     = 'wp-autosharepost-twitter-oauth-secret';
+    const OPTION_TWITTER_URL_SEPERATOR    = 'wp-autosharepost-twitter-oauth-url-seperator';
     
-    const OPTION_BITLY_APIKEY            = 'wp-autosharepost-bitly-apikey';
-    const OPTION_BITLY_LOGIN             = 'wp-autosharepost-bitly-login';
+    const OPTION_BITLY_APIKEY             = 'wp-autosharepost-bitly-apikey';
+    const OPTION_BITLY_LOGIN              = 'wp-autosharepost-bitly-login';
     
-	const OPTION_COMMENTGRABBER_ENABLED  = 'wp-autosharepost-commentgrabber-enabled';
-	const OPTION_COMMENTGRABBER_INTERVAL = 'wp-autosharepost-commentgrabber-interval';
-	const OPTION_COMMENTGRABBER_APPROVE	 = 'wp-autosharepost-commentgrabber-approve';
+	const OPTION_COMMENTGRABBER_ENABLED   = 'wp-autosharepost-commentgrabber-enabled';
+	const OPTION_COMMENTGRABBER_INTERVAL  = 'wp-autosharepost-commentgrabber-interval';
+	const OPTION_COMMENTGRABBER_APPROVE	  = 'wp-autosharepost-commentgrabber-approve';
 	
 	const DEFAULT_COMMENTGRABBER_INTERVAL = 10;
 	 
-    const META_ENABLED                   = 'wp-autosharepost-enabled';
-    const META_FACEBOOK_TEXT             = 'wp-autosharepost-fb-text';
-    const META_FACEBOOK_POST			 = 'wp-autosharepost-fb-post-id';
-    const META_COMMENT_FACEBOOK_ID		 = 'wp-autosharepost-fb-comment-id';
-    const META_COMMENT_FACEBOOK_USER	 = 'wp-autosharepost-fb-comment-user';
-    const META_TWITTER_TEXT              = 'wp-autosharepost-twitter-text';
-    const META_TWITTER_POST				 = 'wp-autosharepost-twitter-post-id';
-    const META_TWITTER_POST_USER		 = 'wp-autosharepost-twitter-post-user';
-    const META_SHARED                    = 'wp-autosharepost-shared';
-    const META_BITLY_URL                 = 'wp-autosharepost-bitly-url';
+    const META_ENABLED                    = 'wp-autosharepost-enabled';
+    const META_FACEBOOK_TEXT              = 'wp-autosharepost-fb-text';
+    const META_FACEBOOK_POST			  = 'wp-autosharepost-fb-post-id';
+    const META_COMMENT_FACEBOOK_ID		  = 'wp-autosharepost-fb-comment-id';
+    const META_COMMENT_FACEBOOK_USER	  = 'wp-autosharepost-fb-comment-user';
+    const META_TWITTER_TEXT               = 'wp-autosharepost-twitter-text';
+    const META_TWITTER_POST				  = 'wp-autosharepost-twitter-post-id';
+    const META_TWITTER_POST_USER		  = 'wp-autosharepost-twitter-post-user';
+    const META_SHARED                     = 'wp-autosharepost-shared';
+    const META_BITLY_URL                  = 'wp-autosharepost-bitly-url';
     
     /**
      * Holds the template class
@@ -348,7 +348,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     {
     	// Add the main settings page
         $pageSettings 		= add_options_page(__('WP-AutoSharePost Settings', WP_AUTOSHAREPOST_DOMAIN),
-        									   __('WP-AutoSharePosts', WP_AUTOSHAREPOST_DOMAIN),
+        									   __('WP-AutoSharePost', WP_AUTOSHAREPOST_DOMAIN),
         									   TRUE,
         									   'wp-autosharepost-settings',
         									   array(&$this, 'actionAutoSharePostSettings'));
@@ -375,33 +375,45 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         		$_POST['autosharepost']['twitter']['url_seperator'] = $_POST['autosharepost']['twitter']['url_seperator_text'];
         	}
         	
+        	// Check if the appId or appSecret have changed ...
+        	$appId 		 = get_option(self::OPTION_FACEBOOK_APPID,     '');
+        	$appSecret   = get_option(self::OPTION_FACEBOOK_APPSECRET, '');
+        	$accessToken = get_option(self::OPTION_FACEBOOK_TOKEN,     '');
+        	
+        	// ... If so reset the app name and the access token
+        	if (!empty($accessToken) && ($appId != $_POST['autosharepost']['facebook']['app_id'] ||
+        								 $appSecret != $_POST['autosharepost']['facebook']['app_secret'])) {
+				update_option(self::OPTION_FACEBOOK_APPNAME, '');
+                update_option(self::OPTION_FACEBOOK_TOKEN,   '');
+        	}
+        	
             // General options
             update_option(self::OPTION_AUTOENABLED,             $_POST['autosharepost']['enabled']);
             
             // Facebook options
-            update_option(self::OPTION_FACEBOOK_APPID,          $_POST['autosharepost']['facebook']['app_id']);
-            update_option(self::OPTION_FACEBOOK_APPSECRET,      $_POST['autosharepost']['facebook']['app_secret']);
-            update_option(self::OPTION_FACEBOOK_PAGEID,         $_POST['autosharepost']['facebook']['page_id']);
+            update_option(self::OPTION_FACEBOOK_APPID,          trim($_POST['autosharepost']['facebook']['app_id']));
+            update_option(self::OPTION_FACEBOOK_APPSECRET,      trim($_POST['autosharepost']['facebook']['app_secret']));
+            update_option(self::OPTION_FACEBOOK_PAGEID,         trim($_POST['autosharepost']['facebook']['page_id']));
             update_option(self::OPTION_FACEBOOK_POSTINGTYPE,    $_POST['autosharepost']['facebook']['type']);
             update_option(self::OPTION_FACEBOOK_DESCRIPTION,    intval($_POST['autosharepost']['facebook']['description']));
             update_option(self::OPTION_FACEBOOK_DISABLE_BITLY,  $_POST['autosharepost']['facebook']['disable_bitly']);
             
             // Twitter options
-            update_option(self::OPTION_TWITTER_CONSUMER_KEY,    $_POST['autosharepost']['twitter']['consumer_key']);
-            update_option(self::OPTION_TWITTER_CONSUMER_SECRET, $_POST['autosharepost']['twitter']['consumer_secret']);
-            update_option(self::OPTION_TWITTER_OAUTH_TOKEN,     $_POST['autosharepost']['twitter']['oauth_token']);
-            update_option(self::OPTION_TWITTER_OAUTH_SECRET,    $_POST['autosharepost']['twitter']['oauth_secret']);
+            update_option(self::OPTION_TWITTER_CONSUMER_KEY,    trim($_POST['autosharepost']['twitter']['consumer_key']));
+            update_option(self::OPTION_TWITTER_CONSUMER_SECRET, trim($_POST['autosharepost']['twitter']['consumer_secret']));
+            update_option(self::OPTION_TWITTER_OAUTH_TOKEN,     trim($_POST['autosharepost']['twitter']['oauth_token']));
+            update_option(self::OPTION_TWITTER_OAUTH_SECRET,    trim($_POST['autosharepost']['twitter']['oauth_secret']));
             update_option(self::OPTION_TWITTER_URL_SEPERATOR,   $_POST['autosharepost']['twitter']['url_seperator']);
             
             // Bit.ly options
-            update_option(self::OPTION_BITLY_APIKEY,       	    $_POST['autosharepost']['bitly']['api_key']);
-            update_option(self::OPTION_BITLY_LOGIN,             $_POST['autosharepost']['bitly']['login']);
+            update_option(self::OPTION_BITLY_APIKEY,       	    trim($_POST['autosharepost']['bitly']['api_key']));
+            update_option(self::OPTION_BITLY_LOGIN,             trim($_POST['autosharepost']['bitly']['login']));
         }
         
         // These have to be loaded first, because we need them if we got back
         // from facebook and have to iterate over all pages/apps
-        $appId          = get_option(self::OPTION_FACEBOOK_APPID, '');
-        $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID, '');
+        $appId          = get_option(self::OPTION_FACEBOOK_APPID,     '');
+        $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID,    '');
         $appSecret      = get_option(self::OPTION_FACEBOOK_APPSECRET, '');
 
         // Token was requested
@@ -421,7 +433,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     
                     // Iterate over all retrieved pages and apps to get their access_token
                     foreach ($result['data'] as $app) {
-                        if ($app['id'] == $searchId) {
+                        if (trim($app['id']) == trim($searchId)) {
                             update_option(self::OPTION_FACEBOOK_APPNAME, $app['name']);
                             update_option(self::OPTION_FACEBOOK_TOKEN, $app['access_token']);
                             $found = TRUE;
@@ -449,8 +461,10 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->facebookAppName     = get_option(self::OPTION_FACEBOOK_APPNAME, '');
         $this->_tpl->facebookAccessToken = get_option(self::OPTION_FACEBOOK_TOKEN, '');
         $this->_tpl->facebookLogin       = $this->_facebook->getLoginUrl(array(
-            'scope' => 'manage_pages',
-            'display' => 'page'
+            'scope'        => 'manage_pages',
+            'display'      => 'page',
+        	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
+        					  . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
         ));
         $this->_tpl->facebookPostingType	  = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, 'link');
         $this->_tpl->facebookDescriptionWords = get_option(self::OPTION_FACEBOOK_DESCRIPTION, 40);
