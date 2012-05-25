@@ -193,7 +193,10 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         if ($this->_bitly === NULL) {
         	$api_key = get_option(self::OPTION_BITLY_APIKEY, NULL);
-        	$login = get_option(self::OPTION_BITLY_LOGIN, NULL);
+        	$login   = get_option(self::OPTION_BITLY_LOGIN, NULL);
+        	
+        	if (empty($api_key)) $api_key = NULL;
+        	if (empty($login))   $login = NULL;
         	
         	if ($api_key !== NULL && $login !== NULL) {
 	            $this->_bitly = new Bitly();
@@ -623,7 +626,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             }
             
             $picture = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'large');
-            var_dump($picture);
             
             // Post on facebook.com
             $disableBitly = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
