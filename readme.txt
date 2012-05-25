@@ -18,11 +18,11 @@ messages and grabs the facebook comments.
 A wordpress plugin to automatically share posts via twitter and facebook with a
 CommentGrabber to grab all comments posted on a facebook post which is connected
 with a blog post. The Comment Grabber requires wp-cron to run as a real cronjob
-to work properly. See "Getting Started" under "Installation" to get more information.
+to work properly. See "**[Getting Started](http://wordpress.org/extend/plugins/wordpress-autosharepost/installation/)**" under "**[Installation](http://wordpress.org/extend/plugins/wordpress-autosharepost/installation/)**" to get more information.
 
 = Special Thanks =
 
-I want to thank all employees at [Checkdomain](https://www.checkdomain.de/) who
+I want to thank all employees at **[Checkdomain](https://www.checkdomain.de/)** who
 sponsored me with some domains and a webhosting package. 
 
 == Installation ==
@@ -38,12 +38,12 @@ Just follow these steps to get things working for each of these social networks
 
 1. Visit [developers.facebook.com](https://developers.facebook.com/apps) and create a new application
 2. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
-3. Copy and paste the "App ID" and "App Secret" shown on facebook for your application 
+3. Copy and paste the "**App ID**" and "**App Secret**" shown on facebook for your application 
    in the corresponding fields on the plugin settings page
 4. If you want to administrate a page then you can also provide the plugin with 
-   your your "Page ID"
+   your your "**Page ID**"
 5. Save the settings
-6. After saving request a new "Access Token" with the "Request token" Link on
+6. After saving request a new "**Access Token**" with the "**Request Access-Token**" Link on
    the plugin settings page
 7. Your Facebook App will now ask for access to manage your page. Grant it and 
    you're ready to share posts on Facebook.
@@ -52,12 +52,12 @@ Just follow these steps to get things working for each of these social networks
 
 1. To enable the Facebook CommentGrabber just visit the plugin settings page under
    http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-commentgrabber
-2. Check "Enable CommentGrabber" to enable the CommentGrabber.
+2. Check "**Enable CommentGrabber**" to enable the CommentGrabber.
 3. Specify an interval in which the CommentGrabber checks for new comments on
    Facebook.
-4. Check the "Auto-Approve new Comments" Option to approve every comment which 
+4. Check the "**Auto-Approve new Comments**" Option to approve every comment which 
    comes from Facebook directly.
-5. Because the CommentGrabber uses the Wordpress Cron it is highly recommended, 
+5. Because the CommentGrabber uses the Wordpress Cron it is **highly recommended**, 
    that you switch to a normal cron before using the CommentGrabber. If you do 
    not your users may be interupted while trying to access your page. Some 
    Facebook requests may take some time to finish.
@@ -65,13 +65,13 @@ Just follow these steps to get things working for each of these social networks
 = Twitter =
 
 1. Visit [dev.twitter.com](https://dev.twitter.com/apps/new) and create a new app
-2. Click on the "Settings"-Tab and locate "Application Type". Here you have to
-   change the "Access"-Level to "Read and Write". Save these settings.
-3. Go back to the "Details"-Tab and click "Create my access token" at the end
+2. Click on the "**Settings**"-Tab and locate "**Application Type**". Here you have to
+   change the "**Access"-Level**" to "**Read and Write**". Save these settings.
+3. Go back to the "**Details**"-Tab and click "**Create my access token**" at the end
    of the page.
 4. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
-5. Now copy and paste all needed settings. You need the "Consumer key", 
-   "Consumer Secret", "Access token" and "Access token secret" to tweet your posts
+5. Now copy and paste all needed settings. You need the "**Consumer key**", 
+   "**Consumer Secret**", "**Access token**" and "**Access token secret**" to tweet your posts
 
 == Upgrade Notice ==
 
@@ -79,10 +79,7 @@ Everything should work fine during upgrade. There is nothing special to think of
 
 == Changelog ==
 
-Here you'll find important notices and our change log.
-
-= 0.2.2 =
-
+This is the plugin changelog from the beginning with version 0.1.1
 
 = 0.2.1 =
 
@@ -99,6 +96,7 @@ Here you'll find important notices and our change log.
 
  1. The WP-AutoSharePost Settings Page
  2. The CommentGrabber Settings Page
+ 3. A sample comment grabbed from facebook
 
 == Frequently Asked Questions ==
 
@@ -120,3 +118,11 @@ to share posts to Google+ as well.
 
 If you have any whishes for more social networks/platforms to be included feel 
 free to contact me at benjamin.paap@googlemail.com
+
+== Information for Theme Designers ==
+
+If you want to support this plugin in your theme and give facebook comments a 
+special appeareance you can check with something like this, if the current 
+comment is a facebook comment:
+
+`<?php if ($comment->comment_type == 'facebook'): ?>`
