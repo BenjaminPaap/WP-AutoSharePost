@@ -97,7 +97,8 @@ Here you'll find important notices and our change log.
 
 == Screenshots ==
 
-
+ 1. The WP-AutoSharePost Settings Page
+ 2. The CommentGrabber Settings Page
 
 == Frequently Asked Questions ==
 
