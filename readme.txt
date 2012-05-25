@@ -1,7 +1,7 @@
 === WP-AutoSharePost ===
 
 Contributors: Benjamin Paap
-Donate link: http://www.benjaminpaap.com
+Donate link: http://benjaminpaap.de/entwicklungen/wp-autosharepost/
 Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
 Requires at least: 3.0
 Tested up to: 3.4
@@ -94,9 +94,9 @@ This is the plugin changelog from the beginning with version 0.1.1
 
 == Screenshots ==
 
- 1. The WP-AutoSharePost Settings Page
- 2. The CommentGrabber Settings Page
- 3. A sample comment grabbed from facebook
+1. The WP-AutoSharePost Settings Page
+2. The CommentGrabber Settings Page
+3. A sample comment grabbed from facebook
 
 == Frequently Asked Questions ==
 
