@@ -26,6 +26,16 @@ Just follow these steps to get things working for each of these social networks
 7. Your Facebook App will now ask for access to manage your page. Grant it and 
    you're ready to share posts on Facebook.
 
+### Twitter
+1. Visit https://dev.twitter.com/apps/new and create a new app
+2. Click on the "Settings"-Tab and locate "Application Type". Here you have to
+   change the "Access"-Level to "Read and Write". Save these settings.
+3. Go back to the "Details"-Tab and click "Create my access token" at the end
+   of the page.
+4. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
+5. Now copy and paste all needed settings. You need the "Consumer key", 
+   "Consumer Secret", "Access token" and "Access token secret" to tweet your posts
+
 #### CommentGrabber
 1. To enable the Facebook CommentGrabber just visit the plugin settings page under
    http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-commentgrabber
@@ -38,17 +48,17 @@ Just follow these steps to get things working for each of these social networks
    that you switch to a normal cron before using the CommentGrabber. If you do 
    not your users may be interupted while trying to access your page. Some 
    Facebook requests may take some time to finish.
+   
+#### Bit.ly
+In order to support URL shortening for your twitter links you should enable bit.ly 
+by supporting the plugin with some valid login details.
 
-### Twitter
-1. Visit https://dev.twitter.com/apps/new and create a new app
-2. Click on the "Settings"-Tab and locate "Application Type". Here you have to
-   change the "Access"-Level to "Read and Write". Save these settings.
-3. Go back to the "Details"-Tab and click "Create my access token" at the end
-   of the page.
-4. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
-5. Now copy and paste all needed settings. You need the "Consumer key", 
-   "Consumer Secret", "Access token" and "Access token secret" to tweet your posts
-
+1. Visit [bitly.com](https://bitly.com/) and sign up. If you are already registered
+   log in now.
+2. Enter your bit.ly username in the corresponing field in the plugin settings 
+   page.
+2. Visit http://bitly.com/a/account and scroll down until you reach the "**API Key**"
+   headline. Copy and paste this code to the plugin settings page.
 
 Feedback
 --------
@@ -66,6 +76,29 @@ to share posts to Google+ as well.
 
 If you have any whishes for more social networks/platforms to be included feel 
 free to contact me at benjamin.paap@googlemail.com
+
+Changelog
+---------
+This is the plugin changelog from the beginning with version 0.1.1
+
+### 0.2.1
+
+ - ADDED: German language files
+ - ADDED: Option to specify what type of message to share to facebook (link/status message)
+ - FIX: When a Blogpost is created and directly published no messages were shared 
+   to social networks. 
+
+### 0.1.1
+
+ - Initial Release of this plugin
+
+Information for Theme Designers
+-------------------------------
+If you want to support this plugin in your theme and give facebook comments a 
+special appeareance you can check with something like this, if the current 
+comment is a facebook comment:
+
+`<?php if ($comment->comment_type == 'facebook'): ?>`
 
 Plugin Homepage
 ---------------
