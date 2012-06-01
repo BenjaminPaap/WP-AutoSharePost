@@ -63,7 +63,7 @@ by supporting the plugin with some valid login details.
 Feedback
 --------
 Any feedback, comments or improvements are welcome. Feel free to contact me at
-benjamin.paap@googlemail.com
+b.paap@checkdomain.de
 
 If you have found any bugs or want to support this project with your bugfixes feel
 free to fork this project and do a pull request. I will then review your changes
@@ -75,7 +75,7 @@ As soon as Google releases their API for Google+ I will implement a possibility
 to share posts to Google+ as well.
 
 If you have any whishes for more social networks/platforms to be included feel 
-free to contact me at benjamin.paap@googlemail.com
+free to contact me at b.paap@checkdomain.de
 
 Changelog
 ---------
@@ -102,7 +102,7 @@ comment is a facebook comment:
 
 Plugin Homepage
 ---------------
-The plugin can also be found under http://benjaminpaap.de/entwicklungen/wp-autosharepost/
+The plugin can also be found under http://blog.checkdomain.de/autosharepost-wordpress-plugin/
 
 Special Thanks
 --------------
