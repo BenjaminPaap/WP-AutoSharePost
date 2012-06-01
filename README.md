@@ -106,4 +106,5 @@ The plugin can also be found under http://blog.checkdomain.de/autosharepost-word
 
 Special Thanks
 --------------
-Special thanks go out to all employees at Checkdomain GmbH visit www.checkdomain.de
+I want to thank all my colleageus at http://www.checkdomain.de/ who
+supported me to create this Wordpress-Plugin

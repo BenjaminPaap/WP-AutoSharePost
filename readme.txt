@@ -1,11 +1,10 @@
 === WP-AutoSharePost ===
 
 Contributors: Benjamin Paap
-Donate link: http://benjaminpaap.de/entwicklungen/wp-autosharepost/
 Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
 Requires at least: 3.0
 Tested up to: 3.4
-Stable tag: 0.2
+Stable tag: 0.2.1
 License: GPLv2 or later
 
 This plugin automatically shares posts to facebook and twitter with predefined
@@ -18,12 +17,14 @@ messages and grabs the facebook comments.
 A wordpress plugin to automatically share posts via twitter and facebook with a
 CommentGrabber to grab all comments posted on a facebook post which is connected
 with a blog post. The Comment Grabber requires wp-cron to run as a real cronjob
-to work properly. See "**[Getting Started](http://wordpress.org/extend/plugins/wordpress-autosharepost/installation/)**" under "**[Installation](http://wordpress.org/extend/plugins/wordpress-autosharepost/installation/)**" to get more information.
+to work properly. See "**[Getting Started](http://wordpress.org/extend/plugins/wordpress-autosharepost/installation/)**" 
+under "**[Installation](http://wordpress.org/extend/plugins/wordpress-autosharepost/installation/)**" 
+to get more information.
 
 = Special Thanks =
 
-I want to thank all employees at **[Checkdomain](https://www.checkdomain.de/)** who
-sponsored me with some domains and a webhosting package. 
+I want to thank all my colleageus at **[Checkdomain](http://www.checkdomain.de/)** who
+supported me to create this Wordpress-Plugin
 
 == Installation ==
 
