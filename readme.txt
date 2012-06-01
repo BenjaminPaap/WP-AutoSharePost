@@ -36,7 +36,10 @@ Just follow these steps to get things working for each of these social networks
 
 = Facebook =
 
-1. Visit [developers.facebook.com](https://developers.facebook.com/apps) and create a new application
+1. Visit [developers.facebook.com](https://developers.facebook.com/apps) and create 
+   a new application. Please note, that you have to supply your domain where your
+   blog is installed in the "**App Domain**" field and a complete URL like 
+   "http://yourdomain.com" in the "Website with Facebook Login" field.
 2. Visit http://[YOUR_DOMAIN]/wp-admin/options-general.php?page=wp-autosharepost-settings
 3. Copy and paste the "**App ID**" and "**App Secret**" shown on facebook for your application 
    in the corresponding fields on the plugin settings page
