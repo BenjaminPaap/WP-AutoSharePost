@@ -117,6 +117,8 @@ Feel free to contact me and discuss any features with me.
  - ADDED: Option to create a new album with every shared picture. Be carefull with
           this option because I don't know what facebook will do if you create many
           albums. This is an option to prevent facebook cumulating your pictures.
+ - FIX: Icons in post will only show up, if post was really shared on this social
+        network. Before both icons were shown if the post was shared on any network.
 
 = 0.2.1 =
 
