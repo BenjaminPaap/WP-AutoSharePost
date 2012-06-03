@@ -3,7 +3,7 @@
 Plugin Name: WP-AutoSharePost
 Plugin URI: http://www.wordpress.org/extend/plugins/wordpress-autosharepost/
 Description: Automatically posts published posts on social platforms with a predefined text per post
-Version: 0.2.1
+Version: 0.2.2
 Author: Benjamin Paap
 Author URI: http://www.benjaminpaap.de
 License:
