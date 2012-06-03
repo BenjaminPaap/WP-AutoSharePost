@@ -20,6 +20,33 @@
                         <input type="checkbox" value="1" name="autosharepost[enabled]"<?php echo ($this->autoEnabled == '1') ? ' checked="checked"' : '' ?> />
                     </td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-picture"><?php echo __('Picture to share', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <select id="wasp-picture" name="autosharepost[picture]">
+                        	<option value="none" <?php echo ($this->picture == 'none') ? 'selected="selected"' : '' ?>><?php echo __('None', WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        	<option value="thumbnail" <?php echo ($this->picture == 'thumbnail') ? 'selected="selected"' : '' ?>><?php echo __('Thumbnail', WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        	<option value="attachment" <?php echo ($this->picture == 'attachment') ? 'selected="selected"' : '' ?>><?php echo __('Attachment', WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        </select>
+                        <p>
+                        	<?php echo __('If you want to submit status messages and attach a picture to them select the type of the picture here.', WP_AUTOSHAREPOST_DOMAIN) ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-picture-size"><?php echo __('Size of the picture', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <select id="wasp-picture-size" name="autosharepost[picture_size]">
+                        	<?php foreach(get_intermediate_image_sizes() as $key => $size): ?>
+                        		<option value="<?php echo $size ?>" <?php echo ($this->pictureSize == $size) ? 'selected="selected"' : '' ?>><?php echo $size; ?></option>
+                        	<?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
             </tbody>
         </table>
         
@@ -81,12 +108,21 @@
                     </th>
                     <td>
                         <select id="wasp-fb-posting-type" name="autosharepost[facebook][type]">
-                        	<option value="status" <?php echo ($this->facebookPostingType == 'status') ? 'selected="selected"' : '' ?>><?php echo __('Status Message', WP_AUTOSHAREPOST_DOMAIN) ?></option>
-                        	<option value="link" <?php echo ($this->facebookPostingType == 'link') ? 'selected="selected"' : '' ?>><?php echo __('Shared Link', WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        	<?php foreach (WordpressAutoSharePostAdmin::$facebookPostTypes as $type): ?>
+	                        	<option value="<?php echo $type; ?>" <?php echo ($this->facebookPostingType == $type) ? 'selected="selected"' : '' ?>><?php echo __($type, WP_AUTOSHAREPOST_DOMAIN) ?></option>
+                        	<?php endforeach; ?>
                         </select>
                         <p>
                         	<?php echo __('Specify whether to post a link or a status message on facebook.', WP_AUTOSHAREPOST_DOMAIN) ?>
                         </p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="wasp-picture-album"><?php echo __('Create new album for every picture', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input type="checkbox" id="wasp-picture-album" name="autosharepost[facebook][album]" value="1" <?php echo ($this->facebookAlbum == '1') ? 'checked="checked"' : '' ?> />
                     </td>
                 </tr>
                 <tr valign="top">

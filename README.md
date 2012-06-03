@@ -81,6 +81,27 @@ Changelog
 ---------
 This is the plugin changelog from the beginning with version 0.1.1
 
+### 0.3 (development)
+Would like to hear your thoughts about my plans developing this plugin further. 
+Feel free to contact me and discuss any features with me.
+ 
+ - PLANNED: Create a widget to show every facebook like for your shared post like
+            other twitter widgets do. Maybe a twitter widget too, so that you don't
+            need to install another plugin. 
+ 
+### 0.2.2
+
+ - ADDED: Support for different posting types on facebook.com. You can now choose
+          between 'status', 'link', 'photo'. Currently unsure if 'video' will also
+          be supported in the near future.
+ - ADDED: Posting type can be set in options as default but can be changed in 
+          every article you create.
+ - ADDED: Options to choose from different picture types and sizes to share.
+ - ADDED: Comments from shared photos will be grabbed as well.
+ - ADDED: Option to create a new album with every shared picture. Be carefull with
+          this option because I don't know what facebook will do if you create many
+          albums. This is an option to prevent facebook cumulating your pictures.
+ 
 ### 0.2.1
 
  - ADDED: German language files

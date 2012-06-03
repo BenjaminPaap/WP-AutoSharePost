@@ -23,6 +23,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const OPTION_FACEBOOK_APPNAME         = 'wp-autosharepost-fb-appname';
     const OPTION_FACEBOOK_TOKEN           = 'wp-autosharepost-fb-token';
     const OPTION_FACEBOOK_POSTINGTYPE	  = 'wp-autosharepost-fb-postingtype';
+    const OPTION_FACEBOOK_ALBUM_CREATE	  = 'wp-autosharepost-fb-album-create';
     const OPTION_FACEBOOK_DESCRIPTION	  = 'wp-autosharepost-fb-description';
     const OPTION_FACEBOOK_DISABLE_BITLY   = 'wp-autosharepost-fb-disablebitly';
     
@@ -39,11 +40,16 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	const OPTION_COMMENTGRABBER_INTERVAL  = 'wp-autosharepost-commentgrabber-interval';
 	const OPTION_COMMENTGRABBER_APPROVE	  = 'wp-autosharepost-commentgrabber-approve';
 	
+	const OPTION_SHARE_PICTURE			  = 'wp-autosharepost-share-picture';
+	const OPTION_SHARE_PICTURE_SIZE		  = 'wp-autosharepost-share-picture-size';
+	
 	const DEFAULT_COMMENTGRABBER_INTERVAL = 10;
-	 
+	const DEFAULT_SHARE_PICTURE_SIZE      = 'full';
+	
     const META_ENABLED                    = 'wp-autosharepost-enabled';
     const META_FACEBOOK_TEXT              = 'wp-autosharepost-fb-text';
     const META_FACEBOOK_POST			  = 'wp-autosharepost-fb-post-id';
+    const META_FACEBOOK_POST_TYPE		  = 'wp-autosharepost-fb-post-type';
     const META_COMMENT_FACEBOOK_ID		  = 'wp-autosharepost-fb-comment-id';
     const META_COMMENT_FACEBOOK_USER	  = 'wp-autosharepost-fb-comment-user';
     const META_TWITTER_TEXT               = 'wp-autosharepost-twitter-text';
@@ -51,6 +57,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const META_TWITTER_POST_USER		  = 'wp-autosharepost-twitter-post-user';
     const META_SHARED                     = 'wp-autosharepost-shared';
     const META_BITLY_URL                  = 'wp-autosharepost-bitly-url';
+    
+    const FACEBOOK_POSTING_TYPE_STATUS	  = 'status';
+    const FACEBOOK_POSTING_TYPE_LINK	  = 'link';
+    const FACEBOOK_POSTING_TYPE_PHOTO     = 'photo';
+	const FACEBOOK_POSTING_TYPE_VIDEO 	  = 'video';
+    
+    const PICTURE_NONE 			= 'none';
+    const PICTURE_THUMBNAIL 	= 'thumbnail';
+    const PICTURE_ATTACHMENT 	= 'attachment';
     
     /**
      * Holds the template class
@@ -81,6 +96,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      * @var string
      */
     private $_slug       = 'wp-autosharepost';
+    
+    public static $facebookPostTypes = array(
+    	self::FACEBOOK_POSTING_TYPE_LINK,
+    	self::FACEBOOK_POSTING_TYPE_STATUS,
+    	self::FACEBOOK_POSTING_TYPE_PHOTO,
+    	// self::FACEBOOK_POSTING_TYPE_VIDEO,
+    );
     
     /**
      * Constructor
@@ -240,6 +262,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         $this->_tpl->enabled      = get_post_meta($post->ID, self::META_ENABLED, TRUE);
         $this->_tpl->facebookText = get_post_meta($post->ID, self::META_FACEBOOK_TEXT, TRUE);
+        $this->_tpl->facebookType = get_post_meta($post->ID, self::META_FACEBOOK_POST_TYPE, TRUE);
         $this->_tpl->facebookApp  = get_option(self::OPTION_FACEBOOK_APPID, NULL);
         $this->_tpl->facebookPage = get_option(self::OPTION_FACEBOOK_PAGEID, NULL);
         $this->_tpl->twitterText  = get_post_meta($post->ID, self::META_TWITTER_TEXT, TRUE);
@@ -247,6 +270,9 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         if (strlen($this->_tpl->enabled) == 0) {
         	$this->_tpl->enabled = get_option(self::OPTION_AUTOENABLED, 0);
+        }
+        if (empty($this->_tpl->facebookType)) {
+        	$this->_tpl->facebookType = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, self::FACEBOOK_POSTING_TYPE_LINK);
         }
         
         if (strtotime($this->_tpl->shared) !== FALSE) {
@@ -275,14 +301,19 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             return;
         }
         
+        $post = get_post($post_id);
+        
         if (!empty($_POST['autosharepost']['facebook']['text'])) {
-            update_post_meta($post_id, self::META_FACEBOOK_TEXT, $_POST['autosharepost']['facebook']['text']);
+            update_post_meta($post->ID, self::META_FACEBOOK_TEXT, $_POST['autosharepost']['facebook']['text']);
+        }
+        if (!empty($_POST['autosharepost']['facebook']['type'])) {
+            update_post_meta($post->ID, self::META_FACEBOOK_POST_TYPE, $_POST['autosharepost']['facebook']['type']);
         }
         if (!empty($_POST['autosharepost']['twitter']['text'])) {
-            update_post_meta($post_id, self::META_TWITTER_TEXT, $_POST['autosharepost']['twitter']['text']);
+            update_post_meta($post->ID, self::META_TWITTER_TEXT, $_POST['autosharepost']['twitter']['text']);
         }
         if (!empty($_POST['autosharepost']['enabled'])) {
-            update_post_meta($post_id, self::META_ENABLED, $_POST['autosharepost']['enabled']);
+            update_post_meta($post->ID, self::META_ENABLED, $_POST['autosharepost']['enabled']);
         }
         
     }
@@ -389,12 +420,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         	
             // General options
             update_option(self::OPTION_AUTOENABLED,             $_POST['autosharepost']['enabled']);
+            update_option(self::OPTION_SHARE_PICTURE,           $_POST['autosharepost']['picture']);
+            update_option(self::OPTION_SHARE_PICTURE_SIZE,      $_POST['autosharepost']['picture_size']);
             
             // Facebook options
             update_option(self::OPTION_FACEBOOK_APPID,          trim($_POST['autosharepost']['facebook']['app_id']));
             update_option(self::OPTION_FACEBOOK_APPSECRET,      trim($_POST['autosharepost']['facebook']['app_secret']));
             update_option(self::OPTION_FACEBOOK_PAGEID,         trim($_POST['autosharepost']['facebook']['page_id']));
             update_option(self::OPTION_FACEBOOK_POSTINGTYPE,    $_POST['autosharepost']['facebook']['type']);
+            update_option(self::OPTION_FACEBOOK_ALBUM_CREATE,   $_POST['autosharepost']['facebook']['album']);
             update_option(self::OPTION_FACEBOOK_DESCRIPTION,    intval($_POST['autosharepost']['facebook']['description']));
             update_option(self::OPTION_FACEBOOK_DISABLE_BITLY,  $_POST['autosharepost']['facebook']['disable_bitly']);
             
@@ -453,6 +487,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         // General options
         $this->_tpl->autoEnabled         = get_option(self::OPTION_AUTOENABLED, '');
+        $this->_tpl->picture    	     = get_option(self::OPTION_SHARE_PICTURE, 'none');
+        $this->_tpl->pictureSize         = get_option(self::OPTION_SHARE_PICTURE_SIZE, 'large');
         
         // Facebook options
         $this->_tpl->facebookAppId       = $appId;
@@ -466,7 +502,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
         					  . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
         ));
-        $this->_tpl->facebookPostingType	  = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, 'link');
+        $this->_tpl->facebookPostingType	  = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, self::FACEBOOK_POSTING_TYPE_LINK);
+        $this->_tpl->facebookAlbum			  = get_option(self::OPTION_FACEBOOK_ALBUM_CREATE, 0);
         $this->_tpl->facebookDescriptionWords = get_option(self::OPTION_FACEBOOK_DESCRIPTION, 40);
         $this->_tpl->facebookBitlyDisabled    = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
         
@@ -550,13 +587,18 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	        	if (!isset($post['comments']['count'])) continue;
 	        	if ($post['comments']['count'] == 0) continue;
 	        	
-	        	$post_id = explode('_', $post['id']);
-	        	
+	        	if ($post['type'] == 'photo') {
+	        		$post_id = $post['object_id'];
+	        	} else {
+		        	$parts = explode('_', $post['id']);
+		        	$post_id = $parts[1];
+	        	}
+	        	        	
 	        	// Try to find the attached blog post
 			    $row = $wpdb->get_row("SELECT * "
 			        				 ."FROM $wpdb->postmeta "
 			        			 	 ."WHERE meta_key = '" . self::META_FACEBOOK_POST . "' "
-			        				 ."AND   meta_value = '" . $post_id[1] . "'");
+			        				 ."AND   meta_value = '" . $post_id . "'");
 			    
 			    // Only go on if we found the post for which this comment was
 			    if ($row->post_id > 0) {
@@ -618,7 +660,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         // Try to get the post
         $post = get_post($post_id);
         $error = '';
-         
+
+        if (intval(get_post_meta($post->ID, self::META_ENABLED, TRUE)) == '0') {
+        	return;
+        }
+        
         // Share this now on all platforms
         if ($post->post_status == 'publish' && $post->post_type == 'post') {
             // Check if this post already has a shortened bitly url
@@ -639,8 +685,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 }
             }
             
-            $picture = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'large');
-            
             // Post on facebook.com
             $disableBitly = get_option(self::OPTION_FACEBOOK_DISABLE_BITLY, '');
             
@@ -655,13 +699,17 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 'description' => rtrim($text, '.') . '...',
             );
             
-            // Add the correct picture for this status message or link
-            if (is_array($picture)) {
-            	$facebook['picture'] = $picture[0];
-            }
-            
             $accessToken = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
-            $postingType = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, 'link');
+            $postingType = get_post_meta($post_id, self::META_FACEBOOK_POST_TYPE, TRUE);
+            
+	    	// Only support this when the posting type is set to 'status'
+	    	if (in_array($postingType, array(self::FACEBOOK_POSTING_TYPE_PHOTO,
+	    									 self::FACEBOOK_POSTING_TYPE_VIDEO))) {
+	            // Add the correct picture for this status message or link
+	            if ($picture = $this->_getPostPicture($post, $postingType)) {
+	            	$facebook['source'] = '@' . $picture;
+	            }
+	    	}
             
             if (empty($error) && !empty($facebook['message'])) {
                 if (!empty($accessToken)) {
@@ -678,11 +726,36 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     try {
                     	// Share this post and save the post id in a meta field
                     	switch ($postingType) {
-                    		case 'link':
+                    		case self::FACEBOOK_POSTING_TYPE_LINK:
                         		$fb_result = $fb->api('/' . $profileId . '/links', 'POST', $facebook);
                         		break;
-                    		case 'status':
+                        		
+                    		case self::FACEBOOK_POSTING_TYPE_STATUS:
                         		$fb_result = $fb->api('/' . $profileId . '/feed', 'POST', $facebook);
+                    			break;
+                    			
+                    		case self::FACEBOOK_POSTING_TYPE_PHOTO:
+                    			$create_album = get_option(self::OPTION_FACEBOOK_ALBUM_CREATE, 0);
+                    			if (intval($create_album) == 1) {
+                    				$fb_album_result = $fb->api('/' . $profileId . '/albums', 'POST', array(
+                    					'message' => '',
+                    					'name' => date('YmdHis'),
+                    				));
+                    				
+                    				$endpoint = '/' . $fb_album_result['id'] . '/photos';
+                    			} else {
+                    				$endpoint = '/' . $profileId . '/photos';
+                    			}
+                    			
+                    			$facebook['description'] = $facebook['message'];
+                    			
+                    			$fb->setFileUploadSupport(TRUE);
+                        		$fb_result = $fb->api($endpoint, 'POST', $facebook);
+                        		break;
+                        		
+                    		case self::FACEBOOK_POSTING_TYPE_VIDEO:
+                    			$fb->setFileUploadSupport(TRUE);
+                        		$fb_result = $fb->api('/' . $profileId . '/videos', 'POST', $facebook);
                     			break;
                     	}
                     	
@@ -727,6 +800,44 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             	echo '<div class="error">' . $error . '</div>';
             }
         }
+    }
+    
+    /**
+     * Retrieves a picture to share
+     *
+     * This method retrieves a picture to share to social networks for a
+     * specified post
+     *
+     * @param object $post
+     * @param string $type
+     * @return string
+     */
+    protected function _getPostPicture($post, $type)
+    {
+    	$picture = NULL;
+    	$option_size = get_option(self::OPTION_SHARE_PICTURE_SIZE, self::DEFAULT_SHARE_PICTURE_SIZE);
+    	
+    	// Check which picture we should take
+    	$option_share = get_option(self::OPTION_SHARE_PICTURE, self::PICTURE_THUMBNAIL);
+
+    	if ($option_share == self::PICTURE_THUMBNAIL) {
+    		$picture = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), $option_size);
+    	} elseif ($option_share == self::PICTURE_ATTACHMENT) {
+    		// When set to 'attachment' we take the first available attachment
+    		if (preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post->post_content, $matches)) {
+	    		$image = parse_url($matches[1][0]);
+	    		
+	    		if (!empty($image['path'])) {
+	    			$picture = array($image['path']);
+	    		}
+    		}
+    	}
+    	
+    	if ($picture !== NULL) {
+    		return $_SERVER['DOCUMENT_ROOT'] . $picture[0];
+    	} else {
+    		return FALSE;
+    	}
     }
 
 }

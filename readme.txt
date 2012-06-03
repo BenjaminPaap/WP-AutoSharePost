@@ -1,6 +1,6 @@
 === WP-AutoSharePost ===
 
-Contributors: Benjamin Paap
+Contributors: Benjamin Paap, Checkdomain
 Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
 Requires at least: 3.0
 Tested up to: 3.4
@@ -97,12 +97,33 @@ Everything should work fine during upgrade. There is nothing special to think of
 
 This is the plugin changelog from the beginning with version 0.1.1
 
+= 0.3 (development) =
+Would like to hear your thoughts about my plans developing this plugin further. 
+Feel free to contact me and discuss any features with me.
+ 
+ - PLANNED: Create a widget to show every facebook like for your shared post like
+            other twitter widgets do. Maybe a twitter widget too, so that you don't
+            need to install another plugin. 
+ 
+= 0.2.2 =
+
+ - ADDED: Support for different posting types on facebook.com. You can now choose
+          between 'status', 'link', 'photo'. Currently unsure if 'video' will also
+          be supported in the near future.
+ - ADDED: Posting type can be set in options as default but can be changed in 
+          every article you create.
+ - ADDED: Options to choose from different picture types and sizes to share.
+ - ADDED: Comments from shared photos will be grabbed as well.
+ - ADDED: Option to create a new album with every shared picture. Be carefull with
+          this option because I don't know what facebook will do if you create many
+          albums. This is an option to prevent facebook cumulating your pictures.
+
 = 0.2.1 =
 
  - ADDED: German language files
  - ADDED: Option to specify what type of message to share to facebook (link/status message)
  - FIX: When a Blogpost is created and directly published no messages were shared 
-   to social networks. 
+        to social networks. 
 
 = 0.1.1 =
 
@@ -121,7 +142,7 @@ None yet.
 == Feedback ==
 
 Any feedback, comments or improvements are welcome. Feel free to contact me at
-benjamin.paap@googlemail.com
+b.paap@checkdomain.de
 
 If you have found any bugs or want to support this project with your bugfixes feel
 free to fork this project and do a pull request. I will then review your changes
@@ -133,7 +154,7 @@ As soon as Google releases their API for Google+ I will implement a possibility
 to share posts to Google+ as well.
 
 If you have any whishes for more social networks/platforms to be included feel 
-free to contact me at benjamin.paap@googlemail.com
+free to contact me at b.paap@checkdomain.de
 
 == Information for Theme Designers ==
 
