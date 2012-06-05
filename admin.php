@@ -22,6 +22,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const OPTION_FACEBOOK_PAGEID          = 'wp-autosharepost-fb-pageid';
     const OPTION_FACEBOOK_APPNAME         = 'wp-autosharepost-fb-appname';
     const OPTION_FACEBOOK_TOKEN           = 'wp-autosharepost-fb-token';
+    const OPTION_FACEBOOK_DEFAULT         = 'wp-autosharepost-fb-default';
     const OPTION_FACEBOOK_POSTINGTYPE	  = 'wp-autosharepost-fb-postingtype';
     const OPTION_FACEBOOK_ALBUM_CREATE	  = 'wp-autosharepost-fb-album-create';
     const OPTION_FACEBOOK_DESCRIPTION	  = 'wp-autosharepost-fb-description';
@@ -32,6 +33,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     const OPTION_TWITTER_OAUTH_TOKEN      = 'wp-autosharepost-twitter-oauth-token';
     const OPTION_TWITTER_OAUTH_SECRET     = 'wp-autosharepost-twitter-oauth-secret';
     const OPTION_TWITTER_URL_SEPERATOR    = 'wp-autosharepost-twitter-oauth-url-seperator';
+    const OPTION_TWITTER_DEFAULT          = 'wp-autosharepost-twitter-default';
     
     const OPTION_BITLY_APIKEY             = 'wp-autosharepost-bitly-apikey';
     const OPTION_BITLY_LOGIN              = 'wp-autosharepost-bitly-login';
@@ -431,6 +433,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             update_option(self::OPTION_FACEBOOK_APPID,          trim($_POST['autosharepost']['facebook']['app_id']));
             update_option(self::OPTION_FACEBOOK_APPSECRET,      trim($_POST['autosharepost']['facebook']['app_secret']));
             update_option(self::OPTION_FACEBOOK_PAGEID,         trim($_POST['autosharepost']['facebook']['page_id']));
+            update_option(self::OPTION_FACEBOOK_DEFAULT,    	trim($_POST['autosharepost']['facebook']['default']));
             update_option(self::OPTION_FACEBOOK_POSTINGTYPE,    $_POST['autosharepost']['facebook']['type']);
             update_option(self::OPTION_FACEBOOK_ALBUM_CREATE,   $_POST['autosharepost']['facebook']['album']);
             update_option(self::OPTION_FACEBOOK_DESCRIPTION,    intval($_POST['autosharepost']['facebook']['description']));
@@ -442,6 +445,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             update_option(self::OPTION_TWITTER_OAUTH_TOKEN,     trim($_POST['autosharepost']['twitter']['oauth_token']));
             update_option(self::OPTION_TWITTER_OAUTH_SECRET,    trim($_POST['autosharepost']['twitter']['oauth_secret']));
             update_option(self::OPTION_TWITTER_URL_SEPERATOR,   $_POST['autosharepost']['twitter']['url_seperator']);
+            update_option(self::OPTION_TWITTER_DEFAULT,    		trim($_POST['autosharepost']['twitter']['default']));
             
             // Bit.ly options
             update_option(self::OPTION_BITLY_APIKEY,       	    trim($_POST['autosharepost']['bitly']['api_key']));
@@ -513,6 +517,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
         					  . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
         ));
+        $this->_tpl->facebookDefaultText      = get_option(self::OPTION_FACEBOOK_DEFAULT, '');
         $this->_tpl->facebookPostingType	  = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, self::FACEBOOK_POSTING_TYPE_LINK);
         $this->_tpl->facebookAlbum			  = get_option(self::OPTION_FACEBOOK_ALBUM_CREATE, 0);
         $this->_tpl->facebookDescriptionWords = get_option(self::OPTION_FACEBOOK_DESCRIPTION, 40);
@@ -524,6 +529,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->twitterOAuthToken      = get_option(self::OPTION_TWITTER_OAUTH_TOKEN, '');
         $this->_tpl->twitterOAuthSecret     = get_option(self::OPTION_TWITTER_OAUTH_SECRET, '');
         $this->_tpl->twitterUrlSeperator    = get_option(self::OPTION_TWITTER_URL_SEPERATOR, '');
+        $this->_tpl->twitterDefaultText     = get_option(self::OPTION_TWITTER_DEFAULT, '');
         
         // Bit.ly options
         $this->_tpl->bitlyApiKey         = get_option(self::OPTION_BITLY_APIKEY, '');
@@ -707,8 +713,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 'message'     => get_post_meta($post_id, self::META_FACEBOOK_TEXT, TRUE),
                 'link'        => ($disableBitly == '1') ? $permalink : $bitlyUrl,
             	'name'	 	  => $post->post_title,
-                'description' => rtrim($text, '.') . '...',
             );
+            
+            if (!empty($text)) {
+            	$facebook['description'] = rtrim($text, '.') . '...';
+            }
             
             $accessToken = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
             $postingType = get_post_meta($post_id, self::META_FACEBOOK_POST_TYPE, TRUE);
@@ -720,6 +729,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	            if ($picture = $this->_getPostPicture($post, $postingType)) {
 	            	$facebook['source'] = '@' . $picture;
 	            }
+	    	}
+	    	
+	    	// Check if there are default messages
+	    	if (empty($facebook['message'])) {
+	    		$facebook['message'] = get_option(self::OPTION_FACEBOOK_DEFAULT, '');
 	    	}
             
             if (empty($error) && !empty($facebook['message'])) {
@@ -739,13 +753,14 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     	switch ($postingType) {
                     		case self::FACEBOOK_POSTING_TYPE_LINK:
                         		$fb_result = $fb->api('/' . $profileId . '/links', 'POST', $facebook);
-                        		break;
+                     			break;
                         		
                     		case self::FACEBOOK_POSTING_TYPE_STATUS:
                         		$fb_result = $fb->api('/' . $profileId . '/feed', 'POST', $facebook);
                     			break;
                     			
                     		case self::FACEBOOK_POSTING_TYPE_PHOTO:
+                    			// Check if we shall create a new album for every image
                     			$create_album = get_option(self::OPTION_FACEBOOK_ALBUM_CREATE, 0);
                     			if (intval($create_album) == 1) {
                     				$fb_album_result = $fb->api('/' . $profileId . '/albums', 'POST', array(
@@ -759,11 +774,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     			}
                     			
                     			$facebook['description'] = $facebook['message'];
-                    			
+
+                    			// Upload the new photo
                     			$fb->setFileUploadSupport(TRUE);
                         		$fb_result = $fb->api($endpoint, 'POST', $facebook);
                         		break;
                         		
+                        	// Not yet supported
                     		case self::FACEBOOK_POSTING_TYPE_VIDEO:
                     			$fb->setFileUploadSupport(TRUE);
                         		$fb_result = $fb->api('/' . $profileId . '/videos', 'POST', $facebook);
@@ -782,6 +799,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             $twitter = array(
             	'message' => get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE)
             );
+            
+            // Check if there are default messages
+            if (empty($twitter['message'])) {
+            	$twitter['message'] = get_option(self::OPTION_TWITTER_DEFAULT, '');
+            }
             
             // Tweet on twitter.com
             if (empty($error) && !empty($twitter['message'])) {

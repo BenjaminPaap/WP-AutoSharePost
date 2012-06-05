@@ -118,6 +118,14 @@
                     </td>
                 </tr>
                 <tr valign="top">
+                	<th scope="row">
+                		<label for="wasp-fb-default-text"><?php echo __('Default message', WP_AUTOSHAREPOST_DOMAIN); ?></label>
+                	</th>
+                	<td>
+                		<textarea id="wasp-fb-default-text" name="autosharepost[facebook][default]" rows="3" cols="80"><?php echo $this->facebookDefaultText; ?></textarea>
+                	</td>
+                </tr>
+                <tr valign="top">
                     <th scope="row">
                         <label for="wasp-picture-album"><?php echo __('Create new album for every picture', WP_AUTOSHAREPOST_DOMAIN) ?></label>
                     </th>
@@ -198,6 +206,14 @@
                         	<?php echo __('The seperator which is used to seperate the URL from the text in a Twitter tweet.', WP_AUTOSHAREPOST_DOMAIN); ?>
                         </p>
                     </td>
+                </tr>
+                <tr valign="top">
+                	<th scope="row">
+                		<label for="wasp-twitter-default-text"><?php echo __('Default message', WP_AUTOSHAREPOST_DOMAIN); ?></label>
+                	</th>
+                	<td>
+                		<textarea id="wasp-twitter-default-text" name="autosharepost[twitter][default]" rows="3" cols="80"><?php echo $this->twitterDefaultText; ?></textarea>
+                	</td>
                 </tr>
             </tbody>
         </table>

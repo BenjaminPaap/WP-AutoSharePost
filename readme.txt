@@ -4,7 +4,7 @@ Contributors: Benjamin Paap, Checkdomain
 Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
 Requires at least: 3.0
 Tested up to: 3.4
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 License: GPLv2 or later
 
 This plugin automatically shares posts to facebook and twitter with predefined
@@ -105,6 +105,12 @@ Feel free to contact me and discuss any features with me.
             other twitter widgets do. Maybe a twitter widget too, so that you don't
             need to install another plugin. 
  
+= 0.2.3 =
+
+ - ADDED: Default messages for facebook and twitter. If auto sharing is enabled in
+          a wordpress post the plugin will look for default messages. If they are
+          set the post will be shared.
+          
 = 0.2.2 =
 
  - ADDED: Support for different posting types on facebook.com. You can now choose

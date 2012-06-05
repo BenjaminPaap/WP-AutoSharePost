@@ -88,7 +88,13 @@ Feel free to contact me and discuss any features with me.
  - PLANNED: Create a widget to show every facebook like for your shared post like
             other twitter widgets do. Maybe a twitter widget too, so that you don't
             need to install another plugin. 
- 
+
+### 0.2.3
+
+ - ADDED: Default messages for facebook and twitter. If auto sharing is enabled in
+          a wordpress post the plugin will look for default messages. If they are
+          set the post will be shared.
+
 ### 0.2.2
 
  - ADDED: Support for different posting types on facebook.com. You can now choose
