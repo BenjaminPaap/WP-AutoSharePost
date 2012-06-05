@@ -163,11 +163,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             $appId     = get_option(self::OPTION_FACEBOOK_APPID, NULL);
             $appSecret = get_option(self::OPTION_FACEBOOK_APPSECRET, NULL);
 
-            $this->_facebook = new Facebook(array(
+            $options = array(
                 'appId'  => $appId,
                 'secret' => $appSecret,
                 'cookie' => TRUE,
-            ));
+            );
+            
+            $this->_facebook = new Facebook($options);
         }
 
         return $this->_facebook;
@@ -408,11 +410,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         	
         	// Check if the appId or appSecret have changed ...
         	$appId 		 = get_option(self::OPTION_FACEBOOK_APPID,     '');
+        	$pageId 	 = get_option(self::OPTION_FACEBOOK_PAGEID,    '');
         	$appSecret   = get_option(self::OPTION_FACEBOOK_APPSECRET, '');
         	$accessToken = get_option(self::OPTION_FACEBOOK_TOKEN,     '');
         	
         	// ... If so reset the app name and the access token
-        	if (!empty($accessToken) && ($appId != $_POST['autosharepost']['facebook']['app_id'] ||
+        	if (!empty($accessToken) && ($appId     != $_POST['autosharepost']['facebook']['app_id'] ||
+        								 $pageId    != $_POST['autosharepost']['facebook']['page_id'] ||
         								 $appSecret != $_POST['autosharepost']['facebook']['app_secret'])) {
 				update_option(self::OPTION_FACEBOOK_APPNAME, '');
                 update_option(self::OPTION_FACEBOOK_TOKEN,   '');
@@ -452,37 +456,44 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 
         // Token was requested
         if (isset($_GET['code'])) {
-            $session = $this->_facebook->getAccessToken();
-
-            try {
-                // Ask facebook for all apps and pages this user manages
-                $result = $this->_facebook->api('/me/accounts');
-                if (is_array($result['data'])) {
-                    $found = FALSE;
-
-                    $searchId = $appId;
-                    if (!empty($pageId)) {
-                        $searchId = $pageId;
-                    }
-                    
-                    // Iterate over all retrieved pages and apps to get their access_token
-                    foreach ($result['data'] as $app) {
-                        if (trim($app['id']) == trim($searchId)) {
-                            update_option(self::OPTION_FACEBOOK_APPNAME, $app['name']);
-                            update_option(self::OPTION_FACEBOOK_TOKEN, $app['access_token']);
-                            $found = TRUE;
-                        }
-                    }
-
-                    if ($found === FALSE) {
-                        $this->_tpl->facebookError = sprintf(__('Could not find any app associated with this user with appId "%1$s".', WP_AUTOSHAREPOST_DOMAIN), $appId);
-                    }
-                } else {
-                    $this->_tpl->facebookError = __('"data" member in wrong format.', WP_AUTOSHAREPOST_DOMAIN);
-                }
-            } catch (Exception $e) {
-                $this->_tpl->facebookError = $e->getMessage();
-            }
+        	$user = $this->_getFacebookInstance()->getUser();
+        	
+        	if (!empty($user)) {
+	            try {
+	                // Ask facebook for all apps and pages this user manages
+	                if (!empty($pageId)) {
+		                $result = $this->_getFacebookInstance()->api('/me/accounts');
+		                if (is_array($result['data'])) {
+		                    $found = FALSE;
+		
+		                    // Iterate over all retrieved pages and apps to get their access_token
+		                    foreach ($result['data'] as $app) {
+		                        if (trim($app['id']) == trim($searchId)) {
+		                            update_option(self::OPTION_FACEBOOK_APPNAME, $app['name']);
+		                            update_option(self::OPTION_FACEBOOK_TOKEN, $app['access_token']);
+		                            $found = TRUE;
+		                        }
+		                    }
+		
+		                    if ($found === FALSE) {
+		                        $this->_tpl->facebookError = sprintf(__('Could not find any app associated with this user with appId "%1$s".', WP_AUTOSHAREPOST_DOMAIN), $appId);
+		                    }
+		                } else {
+		                    $this->_tpl->facebookError = __('"data" member in wrong format.', WP_AUTOSHAREPOST_DOMAIN);
+		                }
+	                } else {
+	                	// User wants to share on his own wall
+		                $result = $this->_getFacebookInstance()->api('/me');
+		                
+		                update_option(self::OPTION_FACEBOOK_APPNAME, $result['name']);
+		                update_option(self::OPTION_FACEBOOK_TOKEN, $this->_getFacebookInstance()->getAccessToken());
+	                }
+	            } catch (Exception $e) {
+	                $this->_tpl->facebookError = $e->getMessage();
+	            }
+        	} else {
+        		$this->_tpl->facebookError = __('No facebook user supplied. Did you give all permissions?', WP_AUTOSHAREPOST_DOMAIN);
+        	}
         }
         
         // General options
@@ -497,7 +508,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->facebookAppName     = get_option(self::OPTION_FACEBOOK_APPNAME, '');
         $this->_tpl->facebookAccessToken = get_option(self::OPTION_FACEBOOK_TOKEN, '');
         $this->_tpl->facebookLogin       = $this->_facebook->getLoginUrl(array(
-            'scope'        => 'manage_pages',
+            'scope'        => 'manage_pages,publish_stream',
             'display'      => 'page',
         	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
         					  . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
@@ -720,7 +731,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     $appId          = get_option(self::OPTION_FACEBOOK_APPID, '');
                     $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID, '');
                     
-                    $profileId = $appId;
+                    $profileId = 'me';
                     if (!empty($pageId)) $profileId = $pageId;
                     
                     try {
