@@ -759,6 +759,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	            }
 	    	}
 	    	
+	    	// If no posting type was specified use the link type as default
+	    	if (empty($postingType)) {
+	    		$postingType = self::FACEBOOK_POSTING_TYPE_LINK;
+	    	}
+	    	
 	    	// Check if there is a default message
 	    	if (empty($facebook['message'])) {
 	    		$facebook['message'] = get_option(self::OPTION_FACEBOOK_DEFAULT, '');
