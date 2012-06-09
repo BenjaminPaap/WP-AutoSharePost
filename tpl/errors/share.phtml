@@ -1,0 +1,30 @@
+<h1><?php echo __('Errors occured during sharing', WP_AUTOSHAREPOST_DOMAIN); ?></h1>
+<p>
+	<?php echo __('Please note, that this post may be shared to some social networks but not all. Check your social network accounts, delete the message and re-share this post if you want to.', WP_AUTOSHAREPOST_DOMAIN); ?>
+</p>
+<table>
+	<thead>
+		<tr>
+			<th><?php echo __('Social Network', WP_AUTOSHAREPOST_DOMAIN); ?></th>
+			<th><?php echo __('Error Message', WP_AUTOSHAREPOST_DOMAIN); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>facebook.com</td>
+			<?php if (isset($this->errors['facebook'])): ?>
+				<td><?php echo $this->errors['facebook']; ?></td>
+			<?php elseif (isset($this->success['facebook'])): ?>
+				<td><?php echo __('Successfully shared', WP_AUTOSHAREPOST_DOMAIN); ?>
+			<?php endif; ?>
+		</tr>
+		<tr>
+			<td>twitter.com</td>
+			<?php if (isset($this->errors['twitter'])): ?>
+				<td><?php echo $this->errors['twitter']; ?></td>
+			<?php elseif (isset($this->success['twitter'])): ?>
+				<td><?php echo __('Successfully shared', WP_AUTOSHAREPOST_DOMAIN); ?>
+			<?php endif; ?>
+		</tr>
+	</tbody>
+</table>

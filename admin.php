@@ -111,10 +111,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     public function __construct()
     {
+        $this->_getFacebookInstance();
+        
     	if (is_admin() || defined('DOING_CRON')) {
 	        add_action('init', array(&$this, 'actionInit'));
 	        add_action('admin_init', array(&$this, 'actionAdminInit'));
     	}
+    	
+        add_action('publish_post',        array(&$this, 'hookPublishPost'));
+        add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
     }
 
     /**
@@ -123,8 +128,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     public function actionInit()
     {
         add_action('admin_menu',          array(&$this, 'hookAdminMenu'));
-        add_action('publish_post',        array(&$this, 'hookPublishPost'));
-        add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
         
         add_action('wp_autosharepost_comment_grabber', array(&$this, 'cronCommentGrabber'));
     }
@@ -137,7 +140,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl = new Template();
         $this->_tpl->wasp = $this;
         
-        $this->_getFacebookInstance();
+        $this->_checkFacebookAccessToken();
         
         wp_register_style(self::PLUGIN_STYLE_NAME_MAIN,
         				  plugins_url('/css/wp-autoshareposts.css', __FILE__));
@@ -145,6 +148,59 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         
         add_action('add_meta_boxes',      array(&$this, 'hookAddMetaBoxes'));
         add_action('save_post',           array(&$this, 'hookSavePost'));
+    }
+    
+    protected function _checkFacebookAccessToken()
+    {
+        // These have to be loaded first, because we need them if we got back
+        // from facebook and have to iterate over all pages/apps
+        $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID,    '');
+        
+    	// Token was requested
+    	if (isset($_GET['code'])) {
+    		$user = $this->_getFacebookInstance()->getUser();
+    		 
+    		if (!empty($user)) {
+    			try {
+    				// Ask facebook for all apps and pages this user manages
+    				if (!empty($pageId)) {
+    					$result = $this->_getFacebookInstance()->api('/me/accounts');
+    	
+    					if (is_array($result['data'])) {
+    						$found = FALSE;
+    	
+    						// Iterate over all retrieved pages and apps to get their access_token
+    						foreach ($result['data'] as $app) {
+    							if (trim($app['id']) == trim($pageId)) {
+    								update_option(self::OPTION_FACEBOOK_APPNAME, $app['name']);
+    								update_option(self::OPTION_FACEBOOK_TOKEN, $app['access_token']);
+    								$found = TRUE;
+    	
+    								header('Location: /wp-admin/options-general.php?page=wp-autosharepost-settings');
+    								exit;
+    							}
+    						}
+    	
+    						if ($found === FALSE) {
+    							$this->_tpl->facebookError = sprintf(__('Could not find any app associated with this user with appId "%1$s".', WP_AUTOSHAREPOST_DOMAIN), $appId);
+    						}
+    					} else {
+    						$this->_tpl->facebookError = __('"data" member in wrong format.', WP_AUTOSHAREPOST_DOMAIN);
+    					}
+    				} else {
+    					// User wants to share on his own wall
+    					$result = $this->_getFacebookInstance()->api('/me');
+    	
+    					update_option(self::OPTION_FACEBOOK_APPNAME, $result['name']);
+    					update_option(self::OPTION_FACEBOOK_TOKEN, $this->_getFacebookInstance()->getAccessToken());
+    				}
+    			} catch (Exception $e) {
+    				$this->_tpl->facebookError = $e->getMessage();
+    			}
+    		} else {
+    			$this->_tpl->facebookError = __('No facebook user supplied. Did you give all permissions?', WP_AUTOSHAREPOST_DOMAIN);
+    		}
+    	}
     }
 
     /**
@@ -169,6 +225,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 'appId'  => $appId,
                 'secret' => $appSecret,
                 'cookie' => TRUE,
+            	'scope'  => 'manage_pages,publish_stream,share_item'
             );
             
             $this->_facebook = new Facebook($options);
@@ -191,13 +248,23 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             include_once(WP_AUTOSHAREPOST_DIR . 'lib/twitter/twitter.php');
         }
         
+        $consumer_key    = get_option(self::OPTION_TWITTER_CONSUMER_KEY, '');
+        $consumer_secret = get_option(self::OPTION_TWITTER_CONSUMER_SECRET, '');
+        $oauth_token     = get_option(self::OPTION_TWITTER_OAUTH_TOKEN, '');
+        $oauth_secret    = get_option(self::OPTION_TWITTER_OAUTH_SECRET, '');
+        
         if ($this->_twitter === NULL) {
-            $this->_twitter = new TwitterOAuth(
-                get_option(self::OPTION_TWITTER_CONSUMER_KEY, ''),
-                get_option(self::OPTION_TWITTER_CONSUMER_SECRET, ''),
-                get_option(self::OPTION_TWITTER_OAUTH_TOKEN, ''),
-                get_option(self::OPTION_TWITTER_OAUTH_SECRET, '')
-            );
+        	if (!empty($consumer_key) &&
+        		!empty($consumer_secret) &&
+        		!empty($oauth_token) &&
+        		!empty($oauth_secret)) {
+	            $this->_twitter = new TwitterOAuth(
+	                $consumer_key,
+	                $consumer_secret,
+	                $oauth_token,
+	                $oauth_secret
+	            );
+        	}
         }
         
         return $this->_twitter;
@@ -367,7 +434,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         }
         
         $enabled = get_post_meta($post_id, self::META_ENABLED, TRUE);
-        $shared = get_post_meta($post_id, self::META_SHARED, TRUE);
+        $shared  = get_post_meta($post_id, self::META_SHARED, TRUE);
         
         if ($enabled == '1' && strtotime($shared) === FALSE) {
             $this->_share($post_id);
@@ -452,71 +519,30 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             update_option(self::OPTION_BITLY_LOGIN,             trim($_POST['autosharepost']['bitly']['login']));
         }
         
-        // These have to be loaded first, because we need them if we got back
-        // from facebook and have to iterate over all pages/apps
-        $appId          = get_option(self::OPTION_FACEBOOK_APPID,     '');
-        $pageId         = get_option(self::OPTION_FACEBOOK_PAGEID,    '');
-        $appSecret      = get_option(self::OPTION_FACEBOOK_APPSECRET, '');
-
-        // Token was requested
-        if (isset($_GET['code'])) {
-        	$user = $this->_getFacebookInstance()->getUser();
-        	
-        	if (!empty($user)) {
-	            try {
-	                // Ask facebook for all apps and pages this user manages
-	                if (!empty($pageId)) {
-		                $result = $this->_getFacebookInstance()->api('/me/accounts');
-		                if (is_array($result['data'])) {
-		                    $found = FALSE;
-		
-		                    // Iterate over all retrieved pages and apps to get their access_token
-		                    foreach ($result['data'] as $app) {
-		                        if (trim($app['id']) == trim($searchId)) {
-		                            update_option(self::OPTION_FACEBOOK_APPNAME, $app['name']);
-		                            update_option(self::OPTION_FACEBOOK_TOKEN, $app['access_token']);
-		                            $found = TRUE;
-		                        }
-		                    }
-		
-		                    if ($found === FALSE) {
-		                        $this->_tpl->facebookError = sprintf(__('Could not find any app associated with this user with appId "%1$s".', WP_AUTOSHAREPOST_DOMAIN), $appId);
-		                    }
-		                } else {
-		                    $this->_tpl->facebookError = __('"data" member in wrong format.', WP_AUTOSHAREPOST_DOMAIN);
-		                }
-	                } else {
-	                	// User wants to share on his own wall
-		                $result = $this->_getFacebookInstance()->api('/me');
-		                
-		                update_option(self::OPTION_FACEBOOK_APPNAME, $result['name']);
-		                update_option(self::OPTION_FACEBOOK_TOKEN, $this->_getFacebookInstance()->getAccessToken());
-	                }
-	            } catch (Exception $e) {
-	                $this->_tpl->facebookError = $e->getMessage();
-	            }
-        	} else {
-        		$this->_tpl->facebookError = __('No facebook user supplied. Did you give all permissions?', WP_AUTOSHAREPOST_DOMAIN);
-        	}
-        }
-        
         // General options
         $this->_tpl->autoEnabled         = get_option(self::OPTION_AUTOENABLED, '');
         $this->_tpl->picture    	     = get_option(self::OPTION_SHARE_PICTURE, 'none');
         $this->_tpl->pictureSize         = get_option(self::OPTION_SHARE_PICTURE_SIZE, 'large');
         
         // Facebook options
-        $this->_tpl->facebookAppId       = $appId;
-        $this->_tpl->facebookAppSecret   = $appSecret;
-        $this->_tpl->facebookPageId      = $pageId;
+        $this->_tpl->facebookAppId       = get_option(self::OPTION_FACEBOOK_APPID, '');
+        $this->_tpl->facebookAppSecret   = get_option(self::OPTION_FACEBOOK_APPSECRET, '');
+        $this->_tpl->facebookPageId      = get_option(self::OPTION_FACEBOOK_PAGEID, '');
         $this->_tpl->facebookAppName     = get_option(self::OPTION_FACEBOOK_APPNAME, '');
         $this->_tpl->facebookAccessToken = get_option(self::OPTION_FACEBOOK_TOKEN, '');
-        $this->_tpl->facebookLogin       = $this->_facebook->getLoginUrl(array(
-            'scope'        => 'manage_pages,publish_stream',
-            'display'      => 'page',
-        	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
-        					  . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
-        ));
+        
+        if (!empty($this->_tpl->facebookAppId) && !empty($this->_tpl->facebookAppSecret)) {
+        	$this->_facebook->setAppId($this->_tpl->facebookAppId);
+        	$this->_facebook->setAppSecret($this->_tpl->facebookAppSecret);
+        	
+	        $this->_tpl->facebookLogin       = $this->_facebook->getLoginUrl(array(
+	            'scope'        => 'manage_pages,publish_stream,share_item',
+	            'display'      => 'page',
+	        	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
+	        					  . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
+	        ));
+	    }
+	    
         $this->_tpl->facebookDefaultText      = get_option(self::OPTION_FACEBOOK_DEFAULT, '');
         $this->_tpl->facebookPostingType	  = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, self::FACEBOOK_POSTING_TYPE_LINK);
         $this->_tpl->facebookAlbum			  = get_option(self::OPTION_FACEBOOK_ALBUM_CREATE, 0);
@@ -676,14 +702,16 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     {
         // Try to get the post
         $post = get_post($post_id);
-        $error = '';
-
+        $errors = array();
+		$success = array();
+		
         if (intval(get_post_meta($post->ID, self::META_ENABLED, TRUE)) == '0') {
         	return;
         }
         
-        // Share this now on all platforms
+        // Share this now on all configured platforms
         if ($post->post_status == 'publish' && $post->post_type == 'post') {
+        
             // Check if this post already has a shortened bitly url
             $bitlyUrl = get_post_meta($post_id, self::META_BITLY_URL, TRUE);
             $permalink = get_permalink($post_id);
@@ -731,12 +759,12 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	            }
 	    	}
 	    	
-	    	// Check if there are default messages
+	    	// Check if there is a default message
 	    	if (empty($facebook['message'])) {
 	    		$facebook['message'] = get_option(self::OPTION_FACEBOOK_DEFAULT, '');
 	    	}
             
-            if (empty($error) && !empty($facebook['message'])) {
+            if (!empty($facebook['message'])) {
                 if (!empty($accessToken)) {
                 	// Get an instance and set the corresponding access token
                     $fb = $this->_getFacebookInstance();
@@ -774,7 +802,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     			}
                     			
                     			$facebook['description'] = $facebook['message'];
-
+								$facebook['name'] 		 = $facebook['message'];
+								
                     			// Upload the new photo
                     			$fb->setFileUploadSupport(TRUE);
                         		$fb_result = $fb->api($endpoint, 'POST', $facebook);
@@ -787,12 +816,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                     			break;
                     	}
                     	
+                    	$success['facebook'] = TRUE;
                         update_post_meta($post_id, self::META_FACEBOOK_POST, $fb_result['id']);
                     } catch(Exception $e) {
-                        $error = sprintf(__('Could not post on facebook.com. Reason: %1$s'), $e->getMessage());
+                        $errors['facebook'] = sprintf(__('Could not post on facebook.com. Reason: %1$s'), $e->getMessage());
                     }
                 } else {
-                    $error = __('Could not post on facebook.com "AccessToken" missing');
+                    $errors['facebook'] = __('Could not post on facebook.com "AccessToken" missing');
                 }
             }
             
@@ -800,37 +830,48 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             	'message' => get_post_meta($post_id, self::META_TWITTER_TEXT, TRUE)
             );
             
-            // Check if there are default messages
+            // Check if there is a default message
             if (empty($twitter['message'])) {
             	$twitter['message'] = get_option(self::OPTION_TWITTER_DEFAULT, '');
             }
             
             // Tweet on twitter.com
-            if (empty($error) && !empty($twitter['message'])) {
+            if (!empty($twitter['message']) && $tw = $this->_getTwitterInstance()) {
                 $seperator = get_option(self::OPTION_TWITTER_URL_SEPERATOR, NULL);
                 if (empty($seperator)) $seperator = ' ';
                 
                 // Tweet this on twitter
-                $tw = $this->_getTwitterInstance();
                 $tw_result = $tw->post('statuses/update', array(
                     'status' => $twitter['message'] . $seperator . $bitlyUrl
                 ));
                 
                 // Check for any errors
                 if (isset($tw_result->error)) {
-                	$error = $tw_result->error;
+                	$errors['twitter'] = $tw_result->error;
                 } else {
                 	// Save TweetID and user
+                	$success['twitter'] = TRUE;
                 	update_post_meta($post_id, self::META_TWITTER_POST, $tw_result->id_str);
                 	update_post_meta($post_id, self::META_TWITTER_POST_USER, (!empty($tw_result->user->screen_name) ? $tw_result->user->screen_name : $tw_result->user->id));
                 }
             }
             
             // Update the shared time
-            if (empty($error)) {
+            if (count($errors) == 0) {
                 update_post_meta($post_id, self::META_SHARED, date('Y-m-d H:i:s'));
             } else {
-            	echo '<div class="error">' . $error . '</div>';
+            	// If any did succeed mark this post as shared
+            	if (count($success) > 0) {
+                	update_post_meta($post_id, self::META_SHARED, date('Y-m-d H:i:s'));
+            	}
+            	
+            	if (!defined('DOING_CRON')) {
+	            	$this->_tpl->errors = $errors;
+	            	$this->_tpl->success = $success;
+	            	
+	        		$this->_tpl->render('errors/share');
+	            	exit;
+            	}
             }
         }
     }

@@ -98,8 +98,12 @@
                     </th>
                     <td>
                         <input id="wasp-fb-token" type="text" class="large-text code" value="<?php echo $this->facebookAccessToken ?>" name="autosharepost[facebook][access_token]" readonly="readonly" />
-                        <br />
-                        <a href="<?php echo $this->facebookLogin; ?>"><?php echo __('Request Facebook Access-Token', WP_AUTOSHAREPOST_DOMAIN) ?></a>
+                        <?php if (isset($this->facebookLogin)): ?>
+	                        <br />
+	                        <a href="<?php echo $this->facebookLogin; ?>"><?php echo __('Request Facebook Access-Token', WP_AUTOSHAREPOST_DOMAIN) ?></a>
+	                    <?php else: ?>
+	                    	<strong><?php echo __('Set AppID and AppSecret before requesting an access token', WP_AUTOSHAREPOST_DOMAIN) ?></strong>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <tr valign="top">
