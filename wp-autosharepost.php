@@ -12,6 +12,7 @@ License:
 define('WP_AUTOSHAREPOST_DIR', plugin_dir_path(__FILE__));
 define('WP_AUTOSHAREPOST_URL', plugin_dir_url(__FILE__));
 define('WP_AUTOSHAREPOST_DOMAIN', 'wordpress-autosharepost');
+define('WP_AUTOSHAREPOST_DEBUG', TRUE);
 
 // Check if this request is from the admin area
 require_once WP_AUTOSHAREPOST_DIR . '/admin.php';

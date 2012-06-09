@@ -41,6 +41,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	const OPTION_COMMENTGRABBER_ENABLED   = 'wp-autosharepost-commentgrabber-enabled';
 	const OPTION_COMMENTGRABBER_INTERVAL  = 'wp-autosharepost-commentgrabber-interval';
 	const OPTION_COMMENTGRABBER_APPROVE	  = 'wp-autosharepost-commentgrabber-approve';
+    const OPTION_COMMENTGRABBER_FB_PAGES  = 'wp-autosharepost-commentgrabber-fb-pages';
 	
 	const OPTION_SHARE_PICTURE			  = 'wp-autosharepost-share-picture';
 	const OPTION_SHARE_PICTURE_SIZE		  = 'wp-autosharepost-share-picture-size';
@@ -456,11 +457,20 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         									   array(&$this, 'actionAutoSharePostSettings'));
         
     	// Add the CommentGrabber settings page
-        $pageSettings 		= add_options_page(__('CommentGrabber Settings', WP_AUTOSHAREPOST_DOMAIN),
+        $commentGrabber		= add_options_page(__('CommentGrabber Settings', WP_AUTOSHAREPOST_DOMAIN),
         									   __('CommentGrabber', WP_AUTOSHAREPOST_DOMAIN),
         									   TRUE,
         									   'wp-autosharepost-commentgrabber',
         									   array(&$this, 'actionCommentGrabberSettings'));
+        
+    	// Add the CommentGrabber settings page
+    	if (defined('WP_AUTOSHAREPOST_DEBUG')) {
+        	$debugPage 		= add_options_page(__('CommentGrabber Debug', WP_AUTOSHAREPOST_DOMAIN),
+        			 						   __('CommentGrabber Debug', WP_AUTOSHAREPOST_DOMAIN),
+        									   TRUE,
+        									   'wp-autosharepost-commentgrabber-debug',
+        									   array(&$this, 'actionCommentGrabberDebug'));
+    	}
     }
 
     /**
@@ -578,6 +588,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             update_option(self::OPTION_COMMENTGRABBER_ENABLED,      $_POST['commentgrabber']['enabled']);
             update_option(self::OPTION_COMMENTGRABBER_INTERVAL,		$_POST['commentgrabber']['interval']);
             update_option(self::OPTION_COMMENTGRABBER_APPROVE,      $_POST['commentgrabber']['approve']);
+            update_option(self::OPTION_COMMENTGRABBER_FB_PAGES,     intval($_POST['commentgrabber']['pages']));
             
             if (intval($_POST['commentgrabber']['enabled']) == 0) {
 	            if (wp_next_scheduled('wp_autosharepost_comment_grabber')) {
@@ -596,8 +607,19 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->grabberEnabled		= get_option(self::OPTION_COMMENTGRABBER_ENABLED, 0);
         $this->_tpl->grabberInterval    = get_option(self::OPTION_COMMENTGRABBER_INTERVAL, self::DEFAULT_COMMENTGRABBER_INTERVAL);
         $this->_tpl->grabberApprove     = get_option(self::OPTION_COMMENTGRABBER_APPROVE, 0);
+        $this->_tpl->grabberPages       = intval(get_option(self::OPTION_COMMENTGRABBER_FB_PAGES, 1));
 
         $this->_tpl->render('settings/comment-grabber');
+    }
+    
+    /**
+     * Debug action for the comment grabber
+     *
+     * This method is only for debugging purposes
+     */
+    public function actionCommentGrabberDebug()
+    {
+    	$this->cronCommentGrabber();
     }
     
     /**
@@ -622,11 +644,30 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $fb = $this->_getFacebookInstance();
         $fb->setAccessToken(get_option(self::OPTION_FACEBOOK_TOKEN, ''));
         
-        $fb_result = $fb->api('/' . $pageId . '/feed/');
+        $posts = array();
+        $pages = get_option(self::OPTION_COMMENTGRABBER_FB_PAGES, 1);
+        $page_link = '/' . $pageId . '/feed/';
         
-        if (is_array($fb_result['data'])) {
+        // Iterate through all pages
+        for ($page = 0; $page < $pages; $page ++) {
+	        $fb_result = $fb->api($page_link);
+        	if (is_array($fb_result['data']) && count($fb_result['data']) > 0) {
+        		foreach ($fb_result['data'] as $post) {
+        			$posts[] = $post;
+        		}
+        	} else {
+        		break;
+        	}
+        	
+        	if (isset($fb_result['paging']['next']) && !empty($fb_result['paging']['next'])) {
+        		$page_link = $fb_result['paging']['next'];
+        		$page_link = substr($page_link, strpos($page_link, '/', 9));
+        	}
+        }
+        
+        if (count($posts) > 0) {
         	// Iterate over all posts
-	        foreach ($fb_result['data'] as $post) {
+	        foreach ($posts as $post) {
 	        	if (!isset($post['comments']['count'])) continue;
 	        	if ($post['comments']['count'] == 0) continue;
 	        	

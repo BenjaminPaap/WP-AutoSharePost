@@ -37,6 +37,14 @@
                         <input id="commentgrabber-auto-approve" type="checkbox" value="1" name="commentgrabber[approve]"<?php echo ($this->grabberApprove == '1') ? ' checked="checked"' : '' ?> />
                     </td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row">
+                        <label for="commentgrabber-pages"><?php echo __('Pages to read from Facebook', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                        <input id="commentgrabber-pages" type="text" name="commentgrabber[pages]" value="<?php echo $this->grabberPages; ?>" />
+                    </td>
+                </tr>
             </tbody>
         </table>
         <p class="submit">
