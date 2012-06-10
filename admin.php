@@ -792,6 +792,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             
             $accessToken = get_option(self::OPTION_FACEBOOK_TOKEN, NULL);
             $postingType = get_post_meta($post_id, self::META_FACEBOOK_POST_TYPE, TRUE);
+	    	
+	    	// If no posting type was specified use the link type as default
+	    	if (empty($postingType)) {
+	    		$postingType = get_option(self::OPTION_FACEBOOK_POSTINGTYPE, self::FACEBOOK_POSTING_TYPE_LINK);
+	    	}
             
 	    	// Only support this when the posting type is set to 'status'
 	    	if (in_array($postingType, array(self::FACEBOOK_POSTING_TYPE_PHOTO,
@@ -800,11 +805,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	            if ($picture = $this->_getPostPicture($post, $postingType)) {
 	            	$facebook['source'] = '@' . $picture;
 	            }
-	    	}
-	    	
-	    	// If no posting type was specified use the link type as default
-	    	if (empty($postingType)) {
-	    		$postingType = self::FACEBOOK_POSTING_TYPE_LINK;
 	    	}
 	    	
 	    	// Check if there is a default message
