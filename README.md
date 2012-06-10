@@ -88,6 +88,9 @@ Feel free to contact me and discuss any features with me.
  - PLANNED: Create a widget to show every facebook like for your shared post like
             other twitter widgets do. Maybe a twitter widget too, so that you don't
             need to install another plugin. 
+ - PLANNED: Wordpress Comment Postback to Facebook. Users can request an access
+            token in their user profile, so that if they answer with a comment to
+            a post this comment is automatically posted to the shared facebook post.
 
 ### 0.2.4
  
