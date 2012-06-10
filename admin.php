@@ -226,7 +226,6 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
                 'appId'  => $appId,
                 'secret' => $appSecret,
                 'cookie' => TRUE,
-            	'scope'  => 'manage_pages,publish_stream,share_item'
             );
             
             $this->_facebook = new Facebook($options);
@@ -542,10 +541,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->facebookAccessToken = get_option(self::OPTION_FACEBOOK_TOKEN, '');
         
         if (!empty($this->_tpl->facebookAppId) && !empty($this->_tpl->facebookAppSecret)) {
-        	$this->_facebook->setAppId($this->_tpl->facebookAppId);
-        	$this->_facebook->setAppSecret($this->_tpl->facebookAppSecret);
+        	// Reset the facebook instance to get login url with correct app id and secret
+        	if (isset($_POST['submit'])) {
+        		$this->_facebook = NULL;
+        	}
+        	$fb = $this->_getFacebookInstance();
         	
-	        $this->_tpl->facebookLogin       = $this->_facebook->getLoginUrl(array(
+	        $this->_tpl->facebookLogin       = $fb->getLoginUrl(array(
 	            'scope'        => 'manage_pages,publish_stream,share_item',
 	            'display'      => 'page',
 	        	'redirect_uri' => ((!empty($_SERVER['HTTPS'])) ? "https://" : "http://")
