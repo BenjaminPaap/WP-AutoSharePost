@@ -4,7 +4,7 @@ Contributors: Benjamin Paap, Checkdomain
 Tags: facebook, share, twitter, comments, grab, grabber, auto, post, social
 Requires at least: 3.0
 Tested up to: 3.4
-Stable tag: 0.2.3
+Stable tag: 0.2.4
 License: GPLv2 or later
 
 This plugin automatically shares posts to facebook and twitter with predefined
@@ -104,6 +104,11 @@ Feel free to contact me and discuss any features with me.
  - PLANNED: Create a widget to show every facebook like for your shared post like
             other twitter widgets do. Maybe a twitter widget too, so that you don't
             need to install another plugin. 
+ 
+= 0.2.4 =
+ 
+ - ADDED: An option to read more pages with the comment grabber.
+ - FIX: Login issue with facebook
  
 = 0.2.3 =
 

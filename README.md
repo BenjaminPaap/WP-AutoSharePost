@@ -89,6 +89,11 @@ Feel free to contact me and discuss any features with me.
             other twitter widgets do. Maybe a twitter widget too, so that you don't
             need to install another plugin. 
 
+### 0.2.4
+ 
+ - ADDED: An option to read more pages with the comment grabber.
+ - FIX: Login issue with facebook
+ 
 ### 0.2.3
 
  - ADDED: Default messages for facebook and twitter. If auto sharing is enabled in
