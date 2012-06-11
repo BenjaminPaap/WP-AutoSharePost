@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wordpress-autosharepost\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-24 21:02+0100\n"
-"PO-Revision-Date: 2012-05-24 22:02+0100\n"
+"POT-Creation-Date: 2012-06-11 08:24+0100\n"
+"PO-Revision-Date: 2012-06-11 08:30+0100\n"
 "Last-Translator: Benjamin Paap <benjamin.paap@googlemail.com>\n"
 "Language-Team: benjaminpaap.com <benjamin.paap@googlemail.com>\n"
 "MIME-Version: 1.0\n"
@@ -16,52 +16,78 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: admin.php:221
-#, fuzzy
-msgid "WP-AutoSharePost"
-msgstr "WP-AutoSharePost"
-
-#: admin.php:347
-msgid "WP-AutoSharePost Settings"
-msgstr "WP-AutoSharePost Einstellungen"
-
-#: admin.php:348
-msgid "WP-AutoSharePosts"
-msgstr "WP-AutoSharePost"
-
-#: admin.php:354
-msgid "CommentGrabber Settings"
-msgstr "CommentGrabber Einstellungen"
-
-#: admin.php:355
-msgid "CommentGrabber"
-msgstr "CommentGrabber"
-
-#: admin.php:429
+#: admin.php:186
 #, php-format
 msgid "Could not find any app associated with this user with appId \"%1$s\"."
 msgstr "Eine Applikation mit der AppId \"%1$s\" konnte für diesen Benutzer nicht gefunden werden."
 
-#: admin.php:432
+#: admin.php:189
 msgid "\"data\" member in wrong format."
 msgstr "\"data\" ist im falschen Format."
 
-#: admin.php:587
+#: admin.php:202
+msgid "No facebook user supplied. Did you give all permissions?"
+msgstr "Kein Facebook User übergeben. Wurden alle nötigen Rechte gegeben?"
+
+#: admin.php:317
+#: admin.php:453
+msgid "WP-AutoSharePost"
+msgstr "WP-AutoSharePost"
+
+#: admin.php:452
+msgid "WP-AutoSharePost Settings"
+msgstr "WP-AutoSharePost Einstellungen"
+
+#: admin.php:459
+msgid "CommentGrabber Settings"
+msgstr "CommentGrabber Einstellungen"
+
+#: admin.php:460
+msgid "CommentGrabber"
+msgstr "CommentGrabber"
+
+#: admin.php:467
+#: admin.php:468
+msgid "CommentGrabber Debug"
+msgstr "CommentGrabber Debug"
+
+#: admin.php:732
 msgid "Could not load data from facebook."
 msgstr "Daten von Facebook konnten nicht geladen werden."
 
-#: admin.php:675
+#: admin.php:870
 #, php-format
 msgid "Could not post on facebook.com. Reason: %1$s"
 msgstr "Beitrag konnte nicht auf Facebook.com gepostet werden. Grund: %1$s"
 
-#: admin.php:678
+#: admin.php:873
 msgid "Could not post on facebook.com \"AccessToken\" missing"
 msgstr "Auf Facebook.com kann nicht gepostet werden. Es gibt noch keinen \"AccessToken\"."
 
-#: wp-autosharepost.php:116
+#: wp-autosharepost.php:117
 msgid "WP-AutoSharePost Interval"
 msgstr "WP-AutoSharePost Interval"
+
+#: tpl/errors/share.phtml:1
+msgid "Errors occured during sharing"
+msgstr "Fehler während dem Teilen aufgetreten"
+
+#: tpl/errors/share.phtml:3
+msgid "Please note, that this post may be shared to some social networks but not all. Check your social network accounts, delete the message and re-share this post if you want to."
+msgstr "Bitte beachten Sie, dass dieser Artikel bereits auf einigen Sozialen Netzwerken veröffentlicht worden sein mag. Prüfen Sie bitte die eingestellten Accounts und löschen Sie eventuell Beiträge aus diesen Netzwerken, bevor Sie diesen Artikel noch einmal teilen."
+
+#: tpl/errors/share.phtml:8
+msgid "Social Network"
+msgstr "Soziales Netzwerk"
+
+#: tpl/errors/share.phtml:9
+msgid "Error Message"
+msgstr "Fehlermeldung"
+
+#: tpl/errors/share.phtml:18
+#: tpl/errors/share.phtml:26
+msgid "Successfully shared"
+msgstr "Erfolgreich geteilt"
 
 #: tpl/metabox/text.phtml:2
 msgid "Post shared"
@@ -75,35 +101,39 @@ msgstr "Beitrag wurde geteilt am"
 msgid "Posting Links"
 msgstr "Beitragslinks"
 
-#: tpl/metabox/text.phtml:22
+#: tpl/metabox/text.phtml:23
 msgid "View Post on Facebook"
 msgstr "Beitrag auf Facebook ansehen"
 
-#: tpl/metabox/text.phtml:27
+#: tpl/metabox/text.phtml:30
 msgid "View Post on Twitter"
 msgstr "Beitrag auf Twitter ansehen"
 
-#: tpl/metabox/text.phtml:32
+#: tpl/metabox/text.phtml:36
 msgid "Re-Share this Post"
 msgstr "Beitrag erneut teilen"
 
-#: tpl/metabox/text.phtml:44
+#: tpl/metabox/text.phtml:48
 msgid "Social Network Post Messages"
 msgstr "Nachrichten für soziale Netzwerke"
 
-#: tpl/metabox/text.phtml:49
+#: tpl/metabox/text.phtml:53
 msgid "Enable AutoSharePost"
 msgstr "WP-AutoSharePost aktivieren"
 
-#: tpl/metabox/text.phtml:57
+#: tpl/metabox/text.phtml:61
 msgid "Facebook Message"
 msgstr "Facebook Nachricht"
 
-#: tpl/metabox/text.phtml:65
+#: tpl/metabox/text.phtml:69
+msgid "Facebook Posting Type"
+msgstr "Beitragstyp"
+
+#: tpl/metabox/text.phtml:81
 msgid "Twitter Message"
 msgstr "Twitter Nachricht"
 
-#: tpl/metabox/text.phtml:70
+#: tpl/metabox/text.phtml:86
 msgid "Characters left"
 msgstr "Zeichen übrig"
 
@@ -132,8 +162,12 @@ msgstr "Minuten"
 msgid "Auto-Approve new Comments"
 msgstr "Neue Kommentare sofort freigeben"
 
-#: tpl/settings/comment-grabber.phtml:43
-#: tpl/settings/index.phtml:195
+#: tpl/settings/comment-grabber.phtml:42
+msgid "Pages to read from Facebook"
+msgstr "Zu lesende Seiten von Facebook"
+
+#: tpl/settings/comment-grabber.phtml:51
+#: tpl/settings/index.phtml:251
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
@@ -145,123 +179,157 @@ msgstr "Einstellungen › WP-AutoSharePost"
 msgid "Enable WP-AutoSharePost"
 msgstr "WP-AutoSharePost aktivieren"
 
-#: tpl/settings/index.phtml:26
+#: tpl/settings/index.phtml:25
+msgid "Picture to share"
+msgstr "Bild"
+
+#: tpl/settings/index.phtml:29
+msgid "None"
+msgstr "Nichts"
+
+#: tpl/settings/index.phtml:30
+msgid "Thumbnail"
+msgstr ""
+
+#: tpl/settings/index.phtml:31
+msgid "Attachment"
+msgstr ""
+
+#: tpl/settings/index.phtml:34
+msgid "If you want to submit status messages and attach a picture to them select the type of the picture here."
+msgstr "When Sie Status Meldungen auf Facebook veröffentlichen wollen und ein Bild teilen möchten können Sie hier den Typ des Bildes definieren."
+
+#: tpl/settings/index.phtml:40
+msgid "Size of the picture"
+msgstr "Größe des Bildes"
+
+#: tpl/settings/index.phtml:53
 msgid "Facebook Settings"
 msgstr "Facebook Einstellungen"
 
-#: tpl/settings/index.phtml:29
+#: tpl/settings/index.phtml:56
 msgid "Facebook Error"
 msgstr "Facebook Fehler"
 
-#: tpl/settings/index.phtml:36
-msgid "App/Page Name"
-msgstr "App/Seiten Name"
+#: tpl/settings/index.phtml:63
+msgid "User/App/Page Name"
+msgstr "Benutzer/App/Seiten Name"
 
-#: tpl/settings/index.phtml:44
+#: tpl/settings/index.phtml:71
 msgid "App ID"
 msgstr ""
 
-#: tpl/settings/index.phtml:52
+#: tpl/settings/index.phtml:79
 msgid "App Secret"
 msgstr ""
 
-#: tpl/settings/index.phtml:60
+#: tpl/settings/index.phtml:87
 msgid "Page ID"
 msgstr "Seiten ID"
 
-#: tpl/settings/index.phtml:65
+#: tpl/settings/index.phtml:92
 msgid "<strong>Optional</strong> Only if you want to manage a page"
 msgstr "<strong>Optional</strong> Nur eintragen, wenn Sie eine Facebook Seite verwalten möchten."
 
-#: tpl/settings/index.phtml:70
+#: tpl/settings/index.phtml:97
 msgid "Token"
 msgstr ""
 
-#: tpl/settings/index.phtml:75
+#: tpl/settings/index.phtml:103
 msgid "Request Facebook Access-Token"
 msgstr "Facebook Access-Token erzeugen"
 
-#: tpl/settings/index.phtml:80
+#: tpl/settings/index.phtml:105
+msgid "Set AppID and AppSecret before requesting an access token"
+msgstr "Bitte die AppID und das AppSecret setzen, bevor ein \"Access Token\" generiert werden kann."
+
+#: tpl/settings/index.phtml:111
 msgid "Posting Type"
 msgstr "Beitragstyp"
 
-#: tpl/settings/index.phtml:84
-msgid "Status Message"
-msgstr "Statusmeldung"
-
-#: tpl/settings/index.phtml:85
-msgid "Shared Link"
-msgstr "Link"
-
-#: tpl/settings/index.phtml:88
+#: tpl/settings/index.phtml:120
 msgid "Specify whether to post a link or a status message on facebook."
 msgstr "Soll die Facebook Nachricht als Statusmeldung oder Link gepostet werden."
 
-#: tpl/settings/index.phtml:94
+#: tpl/settings/index.phtml:126
+#: tpl/settings/index.phtml:216
+msgid "Default message"
+msgstr "Standard Statusmeldung"
+
+#: tpl/settings/index.phtml:134
+msgid "Create new album for every picture"
+msgstr "Neues Album für jedes Bild erstellen"
+
+#: tpl/settings/index.phtml:142
 msgid "Wordcount for description"
 msgstr "Wortanzahl für die Beschreibung"
 
-#: tpl/settings/index.phtml:99
+#: tpl/settings/index.phtml:147
 msgid "This defines the maximum wordcount for the description text of facebook status messages"
 msgstr "Die maximale Anzahl Wörter, welche in einer Facebook Status Nachricht angezeigt werden sollen."
 
-#: tpl/settings/index.phtml:105
+#: tpl/settings/index.phtml:153
 msgid "Disable Bit.ly URL Shortening"
 msgstr "bit.ly Service deaktivieren"
 
-#: tpl/settings/index.phtml:115
+#: tpl/settings/index.phtml:163
 msgid "Twitter Settings"
 msgstr "Twitter Einstellungen"
 
-#: tpl/settings/index.phtml:121
+#: tpl/settings/index.phtml:169
 msgid "Consumer Key"
 msgstr ""
 
-#: tpl/settings/index.phtml:129
+#: tpl/settings/index.phtml:177
 msgid "Consumer Secret"
 msgstr ""
 
-#: tpl/settings/index.phtml:137
+#: tpl/settings/index.phtml:185
 msgid "OAuth Token"
 msgstr ""
 
-#: tpl/settings/index.phtml:145
+#: tpl/settings/index.phtml:193
 msgid "OAuth Secret"
 msgstr ""
 
-#: tpl/settings/index.phtml:153
+#: tpl/settings/index.phtml:201
 msgid "Seperator between Text and URL"
 msgstr "Trenner zwischen Text und URL"
 
-#: tpl/settings/index.phtml:157
+#: tpl/settings/index.phtml:205
 msgid "Whitespace"
 msgstr "Leerzeichen"
 
-#: tpl/settings/index.phtml:158
+#: tpl/settings/index.phtml:206
 msgid "As defined:"
 msgstr "Wie definiert:"
 
-#: tpl/settings/index.phtml:160
+#: tpl/settings/index.phtml:208
 msgid "Put your seperator here"
 msgstr "Trenner hier einsetzen"
 
-#: tpl/settings/index.phtml:162
+#: tpl/settings/index.phtml:210
 msgid "The seperator which is used to seperate the URL from the text in a Twitter tweet."
 msgstr "Das Trennzeichen, welches zwischen Text und URL liegt, um dies voneinander in einer Twitter Nachricht zu trennen."
 
-#: tpl/settings/index.phtml:169
+#: tpl/settings/index.phtml:225
 msgid "Bit.ly Url Shortening"
 msgstr "Bit.ly URL Kürzung"
 
-#: tpl/settings/index.phtml:171
+#: tpl/settings/index.phtml:227
 msgid "Bit.ly is a URL shortening service. This is used to shorten the URL to your Blogpost so that the URL does not consume too many characters from the twitter message itself."
 msgstr "Bit.ly ist ein URL Kürzungsservice, welcher aus einer langen URL eine kurze macht. Solche werden für Twitter benutzt, damit nicht zu viele Zeichen durch die URL verbraucht werden."
 
-#: tpl/settings/index.phtml:177
+#: tpl/settings/index.phtml:233
 msgid "Login"
 msgstr ""
 
-#: tpl/settings/index.phtml:185
+#: tpl/settings/index.phtml:241
 msgid "API Key"
 msgstr ""
 
+#~ msgid "WP-AutoSharePosts"
+#~ msgstr "WP-AutoSharePost"
+
+#~ msgid "Shared Link"
+#~ msgstr "Link"
