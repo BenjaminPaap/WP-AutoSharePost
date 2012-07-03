@@ -676,8 +676,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	        	if ($post['type'] == 'photo') {
 	        		$post_id = $post['object_id'];
 	        	} else {
-		        	$parts = explode('_', $post['id']);
-		        	$post_id = $parts[1];
+	        		$parts = explode('_', $post['id']);
+	        		$post_id = $parts[1];
 	        	}
 	        	        	
 	        	// Try to find the attached blog post
@@ -690,8 +690,23 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 			    if ($row->post_id > 0) {
 			    	$comment_post = get_post($row->post_id);
 			    	
+			    	// Get all comments from facebook and iterate over all pages
+			    	$comments = array();
+			    	
+			    	$page_link = '/' . $post_id . '/comments';
+			    	do {
+			    		$fb_result = $fb->api($page_link);
+			    		$comments = array_merge($comments, $fb_result['data']);
+			    	
+			    		// Read all pages from facebook if any exists
+			    		if (isset($fb_result['paging']['next'])) {
+			    			$page_link = $fb_result['paging']['next'];
+        		            $page_link = substr($page_link, strpos($page_link, '/', 9));
+			    		}
+			    	} while (count($fb_result['data']) > 0);
+			    	
 			    	// Iterate over all comments
-			    	foreach ($post['comments']['data'] as $comment) {
+			    	foreach ($comments as $comment) {
 			    		$comment_row = $wpdb->get_row("SELECT * "
 				    						 		 ."FROM $wpdb->commentmeta "
 				    						 		 ."WHERE meta_key = '" . self::META_COMMENT_FACEBOOK_ID . "' "
