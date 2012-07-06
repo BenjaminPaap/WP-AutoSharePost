@@ -45,6 +45,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
 	
 	const OPTION_SHARE_PICTURE			  = 'wp-autosharepost-share-picture';
 	const OPTION_SHARE_PICTURE_SIZE		  = 'wp-autosharepost-share-picture-size';
+	const OPTION_POST_TYPES               = 'wp-autosharepost-post-types';
 	
 	const DEFAULT_COMMENTGRABBER_INTERVAL = 10;
 	const DEFAULT_SHARE_PICTURE_SIZE      = 'full';
@@ -120,6 +121,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     	}
     	
         add_action('publish_post',        array(&$this, 'hookPublishPost'));
+        add_action('publish page',        array(&$this, 'hookPublishPost'));
         add_action('publish_future_post', array(&$this, 'hookPublishFuturePost'));
     }
 
@@ -202,6 +204,34 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     			$this->_tpl->facebookError = __('No facebook user supplied. Did you give all permissions?', WP_AUTOSHAREPOST_DOMAIN);
     		}
     	}
+    }
+    
+    /**
+     * Gets all allowed post types from the options
+     *
+     * This method returns all post types from the options which are allowed for
+     * use with WP-AutoSharePost
+     *
+     * @return array
+     */
+    protected function _getPostTypes()
+    {
+        // Get the allowed post types from the options. If no options are set use
+        // the default 'post' post type
+        $post_types = get_option(self::OPTION_POST_TYPES, NULL);
+
+        if ($post_types === NULL) {
+            $post_types = array('post');
+        }
+        
+        if (!is_array($post_types)) {
+            $post_types = unserialize($post_types);
+            if (!is_array($post_types)) {
+                $post_types = array('post');
+            }
+        }
+        
+        return $post_types;
     }
 
     /**
@@ -307,17 +337,23 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      * Hook to add a meta box
      *
      * This hook adds a meta box to the "Edit Post" page to define the various
-     * text messages for all configured social networks
+     * text messages for all configured social networks. Post types for which
+     * this meta box will be added can be defined in the settings.
      */
     public function hookAddMetaBoxes()
     {
         wp_enqueue_script($this->_slug, plugin_dir_url(__FILE__) . 'js/autosharepost.js');
         
-        add_meta_box('wp-autosharepost-text',
-	                 __('WP-AutoSharePost', WP_AUTOSHAREPOST_DOMAIN),
-	                 array(&$this, 'hookMetaBoxText'),
-	                 'post',
-	                 'normal');
+        $post_types = $this->_getPostTypes();
+        
+        foreach ($post_types as $post_type) {
+            add_meta_box('wp-autosharepost-text',
+    	                 __('WP-AutoSharePost', WP_AUTOSHAREPOST_DOMAIN),
+    	                 array(&$this, 'hookMetaBoxText'),
+    	                 $post_type,
+    	                 'normal',
+                         'low');
+        }
     }
 
     /**
@@ -364,7 +400,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     public function hookSavePost($post_id)
     {
-        if (!current_user_can('edit_post', $post_id)) {
+        if (wp_is_post_revision($post_id))
+        	$post_id = wp_is_post_revision($post_id);
+        
+        // Check if the current user can edit a post if this is a post
+        if (!current_user_can('edit_post', $post_id) && !is_page($post_id)) {
+            return;
+        }
+        // Check if the current user can edit a page if this is a page
+        if (!current_user_can('edit_page', $post_id) && is_page($post_id)) {
             return;
         }
         
@@ -372,7 +416,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             return;
         }
         
-        $post = get_post($post_id);
+        if ('page' == $_POST['post_type']) {
+            $post = get_page($post_id);
+        } else {
+            $post = get_post($post_id);
+        }
         
         if (!empty($_POST['autosharepost']['facebook']['text'])) {
             update_post_meta($post->ID, self::META_FACEBOOK_TEXT, $_POST['autosharepost']['facebook']['text']);
@@ -387,6 +435,15 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             update_post_meta($post->ID, self::META_ENABLED, $_POST['autosharepost']['enabled']);
         }
         
+        // Special case for pages which are not getting published twice if only updated
+        if ('page' == $_POST['post_type']) {
+            $enabled = get_post_meta($post_id, self::META_ENABLED, TRUE);
+            $shared  = get_post_meta($post_id, self::META_SHARED, TRUE);
+            
+            if ($enabled == '1' && strtotime($shared) === FALSE || $_POST['autosharepost']['re-share'] == '1') {
+            	$this->_share($post_id);
+            }
+        }
     }
     
     /**
@@ -526,6 +583,13 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
             // Bit.ly options
             update_option(self::OPTION_BITLY_APIKEY,       	    trim($_POST['autosharepost']['bitly']['api_key']));
             update_option(self::OPTION_BITLY_LOGIN,             trim($_POST['autosharepost']['bitly']['login']));
+            
+            if (!is_array($_POST['autosharepost']['post_types'])) {
+                $_POST['autosharepost']['post_types'] = array($_POST['autosharepost']['post_types']);
+            }
+            
+            $post_types = serialize($_POST['autosharepost']['post_types']);
+            update_option(self::OPTION_POST_TYPES,              $post_types);
         }
         
         // General options
@@ -573,6 +637,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         $this->_tpl->bitlyApiKey         = get_option(self::OPTION_BITLY_APIKEY, '');
         $this->_tpl->bitlyLogin          = get_option(self::OPTION_BITLY_LOGIN, '');
 
+        $this->_tpl->postTypes           = $this->_getPostTypes();
+        
         $this->_tpl->render('settings/index');
     }
     
@@ -759,7 +825,11 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
     protected function _share($post_id)
     {
         // Try to get the post
-        $post = get_post($post_id);
+        if (isset($_POST['post_type']) && 'page' == $_POST['page_type']) {
+            $post = get_page($post_id);
+        } else {
+            $post = get_post($post_id);
+        }
         $errors = array();
 		$success = array();
 		
@@ -768,7 +838,7 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
         }
         
         // Share this now on all configured platforms
-        if ($post->post_status == 'publish' && $post->post_type == 'post') {
+        if ($post->post_status == 'publish') {
         
             // Check if this post already has a shortened bitly url
             $bitlyUrl = get_post_meta($post_id, self::META_BITLY_URL, TRUE);
@@ -951,6 +1021,8 @@ class WordpressAutoSharePostAdmin extends CheckdomainWordpressBase
      */
     protected function _getPostPicture($post, $type)
     {
+        include_once(ABSPATH . 'wp-includes/post-thumbnail-template.php');
+        
     	$picture = NULL;
     	$option_size = get_option(self::OPTION_SHARE_PICTURE_SIZE, self::DEFAULT_SHARE_PICTURE_SIZE);
     	

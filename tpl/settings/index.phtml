@@ -22,6 +22,19 @@
                 </tr>
                 <tr valign="top">
                     <th scope="row">
+                        <label for="wasp-allowed-post-types"><?php echo __('Allowed Post Types', WP_AUTOSHAREPOST_DOMAIN) ?></label>
+                    </th>
+                    <td>
+                    	<?php foreach(get_post_types(array('public' => TRUE)) as $key => $type): ?>
+                    	    <label>
+                    		    <input type="checkbox" name="autosharepost[post_types][<?php echo $key ?>]" value="<?php echo $type ?>" <?php echo (in_array($type, $this->postTypes)) ? 'checked="checked"' : '' ?> />
+                    		    <?php echo $type; ?>
+                    		</label>
+                    	<?php endforeach; ?>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">
                         <label for="wasp-picture"><?php echo __('Picture to share', WP_AUTOSHAREPOST_DOMAIN) ?></label>
                     </th>
                     <td>
