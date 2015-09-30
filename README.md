@@ -132,7 +132,7 @@ Feel free to contact me and discuss any features with me.
 Information for Theme Designers
 -------------------------------
 If you want to support this plugin in your theme and give facebook comments a 
-special appeareance you can check with something like this, if the current 
+special appearance you can check with something like this, if the current 
 comment is a facebook comment:
 
 `<?php if ($comment->comment_type == 'facebook'): ?>`
